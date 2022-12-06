@@ -1,8 +1,30 @@
 #include "webserver.hpp"
 #include "utils.hpp"
-#include <sstream>
 
-void *send_HTML(void *client_socket);
+void serveFile(int *client_socket)
+{
+    std::string url;
+    std::ostringstream response;
+    std::string date;
+    std::string content;
+    time_t t;
+    time(&t);
+
+    url = "/";
+
+    date = ctime(&t);
+    date.erase(remove(date.begin(), date.end(), '\n'), date.end());
+
+    content = Utils::readFileToBuffer("static/index.html");
+
+    std::cout << "[" + date + "]" + " GET " + url + " HTTP/1.1 200 OK" << std::endl;
+
+    response << "HTTP/1.1 200 OK\nDate: " << date << "\nContent-Type: text/html\nContent-Length: " << content.length() << "\n\n"
+             << content;
+    send(*client_socket, response.str().c_str(), response.str().length(), 0);
+    close(*client_socket);
+    delete client_socket;
+}
 
 Webserver::Webserver()
 {
@@ -24,7 +46,7 @@ void Webserver::runServer()
     std::cout << "Creating socket ..." << std::endl;
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
-    checkSocket(this->server_socket);
+    checkSocket();
 
     std::cout << "Socket created!" << std::endl;
 
@@ -34,35 +56,29 @@ void Webserver::runServer()
 
     std::cout << "Binding socket ..." << std::endl;
 
-    checkBind(this->server_socket, &this->server_address);
+    checkBind();
 
     std::cout << "Binding done!" << std::endl;
 
-    std::cout << "Waiting for incoming requests... (enter 'q' to quit)" << std::endl;
+    std::cout << "Waiting for incoming requests..." << std::endl;
 
     while (true)
     {
-        char chr;
-        checkListen(this->server_socket, this->max_connections);
+        checkListen();
 
-        this->client_socket = new int;
-        this->client_address = NULL;
+        int *client_socket = new int;
+        struct sockaddr_in *client_address = NULL;
 
-        checkAccept(this->server_socket, this->client_socket, (struct sockaddr *)this->client_address);
+        checkAccept(client_socket, (struct sockaddr *)client_address);
 
-        pthread_t t;
-        pthread_create(&t, NULL, send_HTML, (void *)this->client_socket);
-
-        if (std::cin >> chr && chr == 'q')
-        {
-            break;
-        }
+        std::thread th(serveFile, client_socket);
+        th.join();
     }
 }
 
-void Webserver::checkSocket(int server_socket)
+void Webserver::checkSocket()
 {
-    if (server_socket < 0)
+    if (this->server_socket < 0)
     {
         perror("Socket failed: ");
         std::cout << "Error code: " + errno << std::endl;
@@ -70,9 +86,9 @@ void Webserver::checkSocket(int server_socket)
     }
 }
 
-void Webserver::checkBind(int server_socket, struct sockaddr_in *server_address)
+void Webserver::checkBind()
 {
-    if ((bind(server_socket, (struct sockaddr *)server_address, sizeof(*server_address))) < 0)
+    if ((bind(this->server_socket, (struct sockaddr *)&this->server_address, sizeof(this->server_address))) < 0)
     {
         perror("Bind failed");
         std::cout << "Error code: " + errno << std::endl;
@@ -80,9 +96,9 @@ void Webserver::checkBind(int server_socket, struct sockaddr_in *server_address)
     }
 }
 
-void Webserver::checkListen(int server_socket, int num_connections)
+void Webserver::checkListen()
 {
-    if ((listen(server_socket, num_connections)) < 0)
+    if ((listen(this->server_socket, this->max_connections)) < 0)
     {
         perror("Listen failed");
         std::cout << "Error code: " + errno << std::endl;
@@ -90,9 +106,9 @@ void Webserver::checkListen(int server_socket, int num_connections)
     }
 }
 
-void Webserver::checkAccept(int server_socket, int *client_socket, struct sockaddr *client_address)
+void Webserver::checkAccept(int *client_socket, struct sockaddr *client_address)
 {
-    if ((*client_socket = accept(server_socket, (struct sockaddr *)client_address, (socklen_t *)sizeof(client_address))) < 0)
+    if ((*client_socket = accept(this->server_socket, (struct sockaddr *)client_address, (socklen_t *)sizeof(client_address))) < 0)
     {
         perror("Accept failed");
         std::cout << "Error code: " + errno << std::endl;
@@ -135,7 +151,7 @@ void *send_HTML(void *client_socket)
     return NULL;
 }
 
-void Webserver::addRoute(std::string url, std::string response)
+void Webserver::addRoute(std::string url, std::string file_path)
 {
-    this->routes.insert(std::pair<std::string, std::string>(url, response));
+    this->routes.insert(std::pair<std::string, std::string>(url, file_path));
 }

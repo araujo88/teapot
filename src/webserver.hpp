@@ -5,11 +5,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <csignal>
-#include <string.h>
 #include <arpa/inet.h>
 #include <fstream>
 #include <iterator>
 #include <map>
+#include <sstream>
+#include <thread>
+#include <algorithm>
 
 #define BUFFER_SIZE 1024
 
@@ -20,20 +22,19 @@ private:
     unsigned int port;
     unsigned int max_connections;
     int server_socket;
-    int *client_socket;
     struct sockaddr_in server_address;
     struct sockaddr_in *client_address;
     std::map<std::string, std::string> routes;
 
-    void checkSocket(int server_socket);
-    void checkBind(int server_socket, struct sockaddr_in *server_address);
-    void checkListen(int server_socket, int num_connections);
-    void checkAccept(int server_socket, int *client_socket, struct sockaddr *client_address);
-    void addRoute(std::string url, std::string response);
+    void checkSocket();
+    void checkBind();
+    void checkListen();
+    void checkAccept(int *client_socket, struct sockaddr *client_address);
 
 public:
     Webserver();
     Webserver(std::string ip_address, unsigned int port, unsigned int max_connections);
     void runServer();
+    void addRoute(std::string url, std::string file_path);
     ~Webserver();
 };
