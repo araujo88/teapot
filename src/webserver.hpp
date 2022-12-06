@@ -8,7 +8,8 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <fstream>
-#include <list>
+#include <iterator>
+#include <map>
 
 #define BUFFER_SIZE 1024
 
@@ -22,13 +23,13 @@ private:
     int *client_socket;
     struct sockaddr_in server_address;
     struct sockaddr_in *client_address;
-    std::list<std::string> routes;
+    std::map<std::string, std::string> routes;
 
     void checkSocket(int server_socket);
     void checkBind(int server_socket, struct sockaddr_in *server_address);
     void checkListen(int server_socket, int num_connections);
     void checkAccept(int server_socket, int *client_socket, struct sockaddr *client_address);
-    static sighandler_t signalHandler(int sig);
+    void addRoute(std::string url, std::string response);
 
 public:
     Webserver();

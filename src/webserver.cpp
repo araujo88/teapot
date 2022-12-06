@@ -52,6 +52,7 @@ void Webserver::runServer()
 
         pthread_t t;
         pthread_create(&t, NULL, send_HTML, (void *)this->client_socket);
+
         if (std::cin >> chr && chr == 'q')
         {
             break;
@@ -132,4 +133,9 @@ void *send_HTML(void *client_socket)
     close(*(int *)client_socket);
     delete (int *)client_socket;
     return NULL;
+}
+
+void Webserver::addRoute(std::string url, std::string response)
+{
+    this->routes.insert(std::pair<std::string, std::string>(url, response));
 }
