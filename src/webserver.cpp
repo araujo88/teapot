@@ -1,5 +1,6 @@
 #include "webserver.hpp"
 #include "utils.hpp"
+#include <sstream>
 
 void *send_HTML(void *client_socket);
 
@@ -8,8 +9,6 @@ Webserver::Webserver()
     this->ip_address = "127.0.0.1";
     this->port = 8000;
     this->max_connections = 1;
-
-    createServer();
 }
 
 Webserver::Webserver(std::string ip_address, unsigned int port, unsigned int max_connections)
@@ -17,16 +16,15 @@ Webserver::Webserver(std::string ip_address, unsigned int port, unsigned int max
     this->ip_address = ip_address;
     this->port = port;
     this->max_connections = max_connections;
-
-    createServer();
 }
 
-void Webserver::createServer()
+void Webserver::runServer()
 {
+
     std::cout << "Creating socket ..." << std::endl;
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
 
-    checkSocket(server_socket);
+    checkSocket(this->server_socket);
 
     std::cout << "Socket created!" << std::endl;
 
@@ -40,18 +38,24 @@ void Webserver::createServer()
 
     std::cout << "Binding done!" << std::endl;
 
-    std::cout << "Waiting for incoming requests... (press Ctrl+C to quit)" << std::endl;
+    std::cout << "Waiting for incoming requests... (enter 'q' to quit)" << std::endl;
+
     while (true)
     {
+        char chr;
         checkListen(this->server_socket, this->max_connections);
 
-        this->client_socket = (int *)malloc(sizeof(int));
+        this->client_socket = new int;
         this->client_address = NULL;
 
         checkAccept(this->server_socket, this->client_socket, (struct sockaddr *)this->client_address);
 
         pthread_t t;
         pthread_create(&t, NULL, send_HTML, (void *)this->client_socket);
+        if (std::cin >> chr && chr == 'q')
+        {
+            break;
+        }
     }
 }
 
@@ -113,20 +117,19 @@ Webserver::~Webserver()
 
 void *send_HTML(void *client_socket)
 {
-    char server_message[BUFFER_SIZE];
-    char *current_date;
+    std::ostringstream response;
+    std::string current_date;
     std::string content;
     time_t t;
     time(&t);
 
     current_date = ctime(&t);
-    current_date[strcspn(current_date, "\n")] = 0;
 
     content = Utils::readFileToBuffer("static/index.html");
-    sprintf(server_message, "HTTP/1.0 200 OK\nDate: %s\nContent-Type: text/html\nContent-Length: %ld\n\n%s", current_date, strlen(content.c_str()), content.c_str());
-    send(*(int *)client_socket, &server_message, sizeof(server_message), 0);
-    memset(server_message, 0, sizeof(server_message));
+    response << "HTTP/1.1 200 OK\nDate: " << current_date << "Content-Type: text/html\nContent-Length: " << content.length() << "\n\n"
+             << content;
+    send(*(int *)client_socket, response.str().c_str(), response.str().length(), 0);
     close(*(int *)client_socket);
-    free(client_socket);
+    delete (int *)client_socket;
     return NULL;
 }
