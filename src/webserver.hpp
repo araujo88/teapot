@@ -13,8 +13,6 @@
 #include <thread>
 #include <algorithm>
 
-#define BUFFER_SIZE 1024
-
 class Webserver
 {
 private:
@@ -23,7 +21,6 @@ private:
     unsigned int max_connections;
     int server_socket;
     struct sockaddr_in server_address;
-    struct sockaddr_in *client_address;
     std::map<std::string, std::string> routes;
 
     void checkSocket();
