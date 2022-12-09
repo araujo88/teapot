@@ -12,6 +12,6 @@ private:
     std::string description;
 
 public:
-    Response();
+    Response(std::string status_code, std::string headers, std::string body);
     ~Response();
 };

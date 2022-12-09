@@ -1,5 +1,7 @@
 #include "webserver.hpp"
 #include "utils.hpp"
+#include "request.hpp"
+#include "response.hpp"
 
 void serveFile(int *client_socket)
 {

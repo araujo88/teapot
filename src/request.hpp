@@ -1,10 +1,9 @@
 #include <iostream>
-#include "http_status.hpp"
 
 class Request
 {
 private:
-    typedef enum _type
+    typedef enum _method
     {
         GET,
         HEAD,
@@ -15,14 +14,14 @@ private:
         OPTIONS,
         TRACE,
         PATCH
-    } type;
+    } method;
     std::string raw;
     std::string headers;
     std::string body;
     std::string date;
-    std::string method;
+    std::string url;
 
 public:
-    Request();
+    Request(std::string raw_request);
     ~Request();
 };
