@@ -22,6 +22,6 @@ private:
     std::string url;
 
 public:
-    Request(std::string raw_request);
+    Request(std::string raw);
     ~Request();
 };

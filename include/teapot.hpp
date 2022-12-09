@@ -16,6 +16,13 @@
 class Teapot
 {
 private:
+    typedef enum _logging
+    {
+        NORMAL,
+        VERBOSE
+    } logging;
+
+    logging logging_type;
     std::string ip_address;
     unsigned int port;
     unsigned int max_connections;
@@ -30,7 +37,7 @@ private:
 
 public:
     Teapot();
-    Teapot(std::string ip_address, unsigned int port, unsigned int max_connections);
+    Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type);
     void runServer();
     void addRoute(std::string url, std::string file_path);
     ~Teapot();

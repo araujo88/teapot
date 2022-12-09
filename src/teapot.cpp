@@ -3,8 +3,29 @@
 #include "../include/request.hpp"
 #include "../include/response.hpp"
 
+void parseRequest(int *client_socket)
+{
+    char buffer[2048];
+    std::string raw_request;
+
+    if ((recv(*client_socket, (void *)&buffer, sizeof(buffer), 0)) < 0)
+    {
+        perror("Receive error:");
+        printf("Error code: %d\n", errno);
+        exit(1);
+    }
+
+    raw_request = buffer;
+
+    std::cout << raw_request << std::endl;
+
+    Request request(raw_request);
+}
+
 void serveFile(int *client_socket)
 {
+    parseRequest(client_socket);
+
     std::string url;
     std::ostringstream response;
     std::string date;
@@ -33,13 +54,15 @@ Teapot::Teapot()
     this->ip_address = "127.0.0.1";
     this->port = 8000;
     this->max_connections = 1;
+    this->logging_type = NORMAL;
 }
 
-Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_connections)
+Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type)
 {
     this->ip_address = ip_address;
     this->port = port;
     this->max_connections = max_connections;
+    this->logging_type = logging_type;
 }
 
 void Teapot::runServer()
@@ -132,25 +155,6 @@ Teapot::~Teapot()
         std::cout << "Error code: " + errno << std::endl;
         exit(1);
     }
-}
-
-void *send_HTML(void *client_socket)
-{
-    std::ostringstream response;
-    std::string current_date;
-    std::string content;
-    time_t t;
-    time(&t);
-
-    current_date = ctime(&t);
-
-    content = Utils::readFileToBuffer("static/index.html");
-    response << "HTTP/1.1 200 OK\nDate: " << current_date << "Content-Type: text/html\nContent-Length: " << content.length() << "\n\n"
-             << content;
-    send(*(int *)client_socket, response.str().c_str(), response.str().length(), 0);
-    close(*(int *)client_socket);
-    delete (int *)client_socket;
-    return NULL;
 }
 
 void Teapot::addRoute(std::string url, std::string file_path)
