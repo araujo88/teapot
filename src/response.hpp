@@ -1,4 +1,5 @@
 #include <iostream>
+#include "http_status.hpp"
 
 class Response
 {
@@ -8,6 +9,7 @@ private:
     std::string body;
     std::string date;
     std::string status_code;
+    std::string description;
 
 public:
     Response();
