@@ -1,2 +1,2 @@
-# simple-web-server-cpp
+# teapot
 A simple multi-threaded web server in C++
