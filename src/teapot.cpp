@@ -1,7 +1,7 @@
-#include "webserver.hpp"
-#include "utils.hpp"
-#include "request.hpp"
-#include "response.hpp"
+#include "../include/teapot.hpp"
+#include "../include/utils.hpp"
+#include "../include/request.hpp"
+#include "../include/response.hpp"
 
 void serveFile(int *client_socket)
 {
@@ -28,21 +28,21 @@ void serveFile(int *client_socket)
     delete client_socket;
 }
 
-Webserver::Webserver()
+Teapot::Teapot()
 {
     this->ip_address = "127.0.0.1";
     this->port = 8000;
     this->max_connections = 1;
 }
 
-Webserver::Webserver(std::string ip_address, unsigned int port, unsigned int max_connections)
+Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_connections)
 {
     this->ip_address = ip_address;
     this->port = port;
     this->max_connections = max_connections;
 }
 
-void Webserver::runServer()
+void Teapot::runServer()
 {
 
     std::cout << "Creating socket ..." << std::endl;
@@ -78,7 +78,7 @@ void Webserver::runServer()
     }
 }
 
-void Webserver::checkSocket()
+void Teapot::checkSocket()
 {
     if (this->server_socket < 0)
     {
@@ -88,7 +88,7 @@ void Webserver::checkSocket()
     }
 }
 
-void Webserver::checkBind()
+void Teapot::checkBind()
 {
     if ((bind(this->server_socket, (struct sockaddr *)&this->server_address, sizeof(this->server_address))) < 0)
     {
@@ -98,7 +98,7 @@ void Webserver::checkBind()
     }
 }
 
-void Webserver::checkListen()
+void Teapot::checkListen()
 {
     if ((listen(this->server_socket, this->max_connections)) < 0)
     {
@@ -108,7 +108,7 @@ void Webserver::checkListen()
     }
 }
 
-void Webserver::checkAccept(int *client_socket, struct sockaddr *client_address)
+void Teapot::checkAccept(int *client_socket, struct sockaddr *client_address)
 {
     if ((*client_socket = accept(this->server_socket, (struct sockaddr *)client_address, (socklen_t *)sizeof(client_address))) < 0)
     {
@@ -118,7 +118,7 @@ void Webserver::checkAccept(int *client_socket, struct sockaddr *client_address)
     }
 }
 
-Webserver::~Webserver()
+Teapot::~Teapot()
 {
     std::cout << "Closing socket ..." << std::endl;
     if (close(this->server_socket) == 0)
@@ -153,7 +153,7 @@ void *send_HTML(void *client_socket)
     return NULL;
 }
 
-void Webserver::addRoute(std::string url, std::string file_path)
+void Teapot::addRoute(std::string url, std::string file_path)
 {
     this->routes.insert(std::pair<std::string, std::string>(url, file_path));
 }

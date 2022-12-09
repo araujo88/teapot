@@ -13,7 +13,7 @@
 #include <thread>
 #include <algorithm>
 
-class Webserver
+class Teapot
 {
 private:
     std::string ip_address;
@@ -29,9 +29,9 @@ private:
     void checkAccept(int *client_socket, struct sockaddr *client_address);
 
 public:
-    Webserver();
-    Webserver(std::string ip_address, unsigned int port, unsigned int max_connections);
+    Teapot();
+    Teapot(std::string ip_address, unsigned int port, unsigned int max_connections);
     void runServer();
     void addRoute(std::string url, std::string file_path);
-    ~Webserver();
+    ~Teapot();
 };

@@ -1,0 +1,5 @@
+class Headers
+{
+    Headers();
+    ~Headers();
+};

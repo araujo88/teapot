@@ -1,9 +1,9 @@
 #include <iostream>
-#include "src/webserver.hpp"
+#include "../include/teapot.hpp"
 
 int main(int argc, char *argv[])
 {
-    Webserver server("127.0.0.1", 8000, 1);
+    Teapot server;
     server.runServer();
     return 0;
 }
