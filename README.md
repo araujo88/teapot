@@ -1,4 +1,4 @@
-# teapot
+# teapot 🫖
 
 A simple and lightweight multi-threaded web framework in C++.
 
