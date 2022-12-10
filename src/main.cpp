@@ -1,4 +1,3 @@
-#include <iostream>
 #include "../include/teapot.hpp"
 
 int main(int argc, char *argv[])
