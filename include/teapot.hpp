@@ -28,7 +28,7 @@ class Teapot
 private:
     typedef enum _logging
     {
-        DISABLED,
+        DEFAULT,
         NORMAL,
         VERBOSE
     } logging;

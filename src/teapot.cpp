@@ -62,7 +62,7 @@ Teapot::Teapot()
     this->ip_address = "127.0.0.1";
     this->port = 8000;
     this->max_connections = 1;
-    this->logging_type = NORMAL;
+    this->logging_type = DEFAULT;
     this->static_files_dir = "static";
 }
 
@@ -71,7 +71,7 @@ Teapot::Teapot(unsigned int port)
     this->ip_address = "127.0.0.1";
     this->port = port;
     this->max_connections = 1;
-    this->logging_type = NORMAL;
+    this->logging_type = DEFAULT;
     this->static_files_dir = "static";
 }
 
