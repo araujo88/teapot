@@ -55,7 +55,7 @@ public:
     Teapot(unsigned int port);
     Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir);
     void runServer();
-    void addRoute(std::string url, std::string file_path);
+    void serveFile(std::string url, std::string file_path);
     void addMiddleware(Middleware middleware);
     ~Teapot();
 };

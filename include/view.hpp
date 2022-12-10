@@ -6,7 +6,7 @@
 class View
 {
 private:
-    std::string endpoint;
+    std::string url;
     std::string filepath;
 
 public:

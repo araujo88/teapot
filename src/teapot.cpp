@@ -22,23 +22,25 @@ void Teapot::requestHandler(int *client_socket)
     std::cout << "[" + request.getDate() + "]" + " " + request.getMethod() + " " + request.getUrl() + " HTTP/1.1 ";
     if (request.getMethod() == "GET")
     {
-        if (request.getUrl() == "/")
+        try
         {
-            body = Utils::readFileToBuffer(this->static_files_dir + "/index.html");
+            body = Utils::readFileToBuffer(this->static_files_dir + request.getUrl());
+            status_code = 200;
         }
-        else
+        catch (FileNotFoundException &e)
         {
-            try
+            body = Utils::readFileToBuffer(this->static_files_dir + "/404.html");
+            status_code = 404;
+        }
+        for (auto const &[url, file_path] : this->routes)
+        {
+            if (request.getUrl() == url)
             {
-                body = Utils::readFileToBuffer(this->static_files_dir + request.getUrl());
+                body = Utils::readFileToBuffer(this->static_files_dir + file_path);
                 status_code = 200;
             }
-            catch (FileNotFoundException &e)
-            {
-                body = Utils::readFileToBuffer(this->static_files_dir + "/404.html");
-                status_code = 404;
-            }
         }
+
         Response response = Response(body, "text/html", status_code);
         raw_response = response.getRawResponse();
         std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << std::endl;
@@ -185,7 +187,7 @@ Teapot::~Teapot()
     }
 }
 
-void Teapot::addRoute(std::string url, std::string file_path)
+void Teapot::serveFile(std::string url, std::string file_path)
 {
     this->routes.insert(std::pair<std::string, std::string>(url, file_path));
 }
