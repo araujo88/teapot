@@ -33,7 +33,7 @@ void Teapot::requestHandler(int *client_socket)
                 body = Utils::readFileToBuffer(this->static_files_dir + request.getUrl());
                 status_code = 200;
             }
-            catch (FileNotFoundException e)
+            catch (FileNotFoundException &e)
             {
                 body = Utils::readFileToBuffer(this->static_files_dir + "/404.html");
                 status_code = 404;
@@ -61,7 +61,7 @@ Teapot::Teapot()
 {
     this->ip_address = "127.0.0.1";
     this->port = 8000;
-    this->max_connections = 1;
+    this->max_connections = 10;
     this->logging_type = DEFAULT;
     this->static_files_dir = "static";
 }
@@ -70,7 +70,7 @@ Teapot::Teapot(unsigned int port)
 {
     this->ip_address = "127.0.0.1";
     this->port = port;
-    this->max_connections = 1;
+    this->max_connections = 10;
     this->logging_type = DEFAULT;
     this->static_files_dir = "static";
 }

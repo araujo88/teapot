@@ -57,6 +57,6 @@ int main(int argc, char *argv[])
 
 `ip_address`: the server IP address. The default is `127.0.0.1`. <br>
 `port`: the server port. The default is `8000`. <br>
-`max_connections`: the maximum number of simultaneous connections per thread. The default is `1`. <br>
+`max_connections`: the maximum number of simultaneous requests. The default is `10`. <br>
 `logging_type`: the Teapot server provides three levels of logging: `DEFAULT`, `DISABLED` and `VERBOSE`. <br>
 `static_files_dir`: the relative folder path where static files are located. The default is set to `static`. <br>
