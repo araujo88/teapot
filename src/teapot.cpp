@@ -1,50 +1,58 @@
 #include "../include/teapot.hpp"
-#include "../include/utils.hpp"
-#include "../include/request.hpp"
-#include "../include/response.hpp"
 
-void parseRequest(int *client_socket)
+Request Teapot::parseRequest(int *client_socket)
 {
-    char buffer[2048];
+    char buffer[BUFFER_SIZE];
     std::string raw_request;
 
-    if ((recv(*client_socket, (void *)&buffer, sizeof(buffer), 0)) < 0)
-    {
-        perror("Receive error:");
-        printf("Error code: %d\n", errno);
-        exit(1);
-    }
+    checkReceive(client_socket, buffer);
 
-    raw_request = buffer;
+    raw_request = std::string(buffer);
 
-    std::cout << raw_request << std::endl;
-
-    Request request(raw_request);
+    return Request(raw_request);
 }
 
-void serveFile(int *client_socket)
+void Teapot::requestHandler(int *client_socket)
 {
-    parseRequest(client_socket);
+    Request request = parseRequest(client_socket);
+    std::string raw_response;
+    std::string body;
+    unsigned int status_code;
 
-    std::string url;
-    std::ostringstream response;
-    std::string date;
-    std::string content;
-    time_t t;
-    time(&t);
+    std::cout << "[" + request.getDate() + "]" + " " + request.getMethod() + " " + request.getUrl() + " HTTP/1.1 ";
+    if (request.getMethod() == "GET")
+    {
+        if (request.getUrl() == "/")
+        {
+            body = Utils::readFileToBuffer(this->static_files_dir + "/index.html");
+        }
+        else
+        {
+            try
+            {
+                body = Utils::readFileToBuffer(this->static_files_dir + request.getUrl());
+                status_code = 200;
+            }
+            catch (FileNotFoundException e)
+            {
+                body = Utils::readFileToBuffer(this->static_files_dir + "/404.html");
+                status_code = 404;
+            }
+        }
+        Response response = Response(body, "text/html", status_code);
+        raw_response = response.getRawResponse();
+        std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << std::endl;
+    }
+    else
+    {
+        body = Utils::readFileToBuffer(this->static_files_dir + "/500.html");
+        Response response = Response(body, "text/html", 500);
+        raw_response = response.getRawResponse();
+        std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << std::endl;
+    }
 
-    url = "/";
+    send(*client_socket, raw_response.c_str(), raw_response.length(), 0);
 
-    date = ctime(&t);
-    date.erase(remove(date.begin(), date.end(), '\n'), date.end());
-
-    content = Utils::readFileToBuffer("static/index.html");
-
-    std::cout << "[" + date + "]" + " GET " + url + " HTTP/1.1 200 OK" << std::endl;
-
-    response << "HTTP/1.1 200 OK\nDate: " << date << "\nContent-Type: text/html\nContent-Length: " << content.length() << "\n\n"
-             << content;
-    send(*client_socket, response.str().c_str(), response.str().length(), 0);
     close(*client_socket);
     delete client_socket;
 }
@@ -55,14 +63,25 @@ Teapot::Teapot()
     this->port = 8000;
     this->max_connections = 1;
     this->logging_type = NORMAL;
+    this->static_files_dir = "static";
 }
 
-Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type)
+Teapot::Teapot(unsigned int port)
+{
+    this->ip_address = "127.0.0.1";
+    this->port = port;
+    this->max_connections = 1;
+    this->logging_type = NORMAL;
+    this->static_files_dir = "static";
+}
+
+Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir)
 {
     this->ip_address = ip_address;
     this->port = port;
     this->max_connections = max_connections;
     this->logging_type = logging_type;
+    this->static_files_dir = static_files_dir;
 }
 
 void Teapot::runServer()
@@ -84,7 +103,6 @@ void Teapot::runServer()
     checkBind();
 
     std::cout << "Binding done!" << std::endl;
-
     std::cout << "Waiting for incoming requests..." << std::endl;
 
     while (true)
@@ -96,7 +114,7 @@ void Teapot::runServer()
 
         checkAccept(client_socket, (struct sockaddr *)client_address);
 
-        std::thread th(serveFile, client_socket);
+        std::thread th(&Teapot::requestHandler, this, client_socket);
         th.join();
     }
 }
@@ -105,7 +123,7 @@ void Teapot::checkSocket()
 {
     if (this->server_socket < 0)
     {
-        perror("Socket failed: ");
+        perror("Socket failed");
         std::cout << "Error code: " + errno << std::endl;
         exit(1);
     }
@@ -136,6 +154,16 @@ void Teapot::checkAccept(int *client_socket, struct sockaddr *client_address)
     if ((*client_socket = accept(this->server_socket, (struct sockaddr *)client_address, (socklen_t *)sizeof(client_address))) < 0)
     {
         perror("Accept failed");
+        std::cout << "Error code: " + errno << std::endl;
+        exit(1);
+    }
+}
+
+void Teapot::checkReceive(int *client_socket, char buffer[BUFFER_SIZE])
+{
+    if ((recv(*client_socket, (void *)buffer, BUFFER_SIZE, 0)) < 0)
+    {
+        perror("Receive error");
         std::cout << "Error code: " + errno << std::endl;
         exit(1);
     }

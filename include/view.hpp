@@ -1,3 +1,6 @@
+#ifndef VIEW_H_
+#define VIEW_H_
+
 #include <iostream>
 
 class View
@@ -12,3 +15,5 @@ public:
 
     ~View();
 };
+
+#endif
