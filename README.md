@@ -1,6 +1,6 @@
 # teapot
 
-A simple multi-threaded web server in C++
+A simple and lightweight multi-threaded web framework in C++.
 
 ## Getting started
 
