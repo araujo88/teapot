@@ -6,8 +6,11 @@
 
 class Middleware
 {
-    Middleware(Request request, Response response);
-    ~Middleware();
+public:
+    Middleware(){};
+    void requestHandler(Request *request);
+    void responseHandler(Response *response);
+    ~Middleware(){};
 };
 
 #endif

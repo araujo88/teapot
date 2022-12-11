@@ -7,7 +7,7 @@ Response::Response(std::string body, std::string content_type, unsigned int stat
 
     this->content_type = content_type;
     this->status_code = status_code;
-    this->body = body;
+    this->body = "\n" + body;
     this->content_length = body.length();
     this->status_code_description = http_status.description(this->status_code);
     this->date = Utils::date();
@@ -15,7 +15,7 @@ Response::Response(std::string body, std::string content_type, unsigned int stat
     this->headers = {{"HTTP/1.1 " + std::to_string(this->status_code) + " " + this->status_code_description + "\n"},
                      {"Date: " + this->date + "\n"},
                      {"Content-Type: " + this->content_type + "\n"},
-                     {"Content-Length: " + std::to_string(this->content_length) + "\n\n"}};
+                     {"Content-Length: " + std::to_string(this->content_length) + "\n"}};
 
     for (auto const &i : this->headers)
     {
@@ -34,7 +34,7 @@ void Response::addHeader(std::string header)
 {
     std::ostringstream response_stream;
 
-    this->headers.push_back(header);
+    this->headers.push_back(header + "\n");
 
     for (auto const &i : this->headers)
     {

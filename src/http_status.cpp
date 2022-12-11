@@ -86,4 +86,5 @@ std::string HttpStatus::description(int status_code)
         {
             return it->second;
         }
+    return "";
 }

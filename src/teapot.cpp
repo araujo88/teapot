@@ -19,6 +19,8 @@ void Teapot::requestHandler(int *client_socket)
     std::string body;
     unsigned int status_code;
 
+    // sanitizer_middleware.requestHandler(&request);
+
     std::cout << "[" + request.getDate() + "]" + " " + request.getMethod() + " " + request.getUrl() + " HTTP/1.1 ";
     if (request.getMethod() == "GET")
     {
@@ -40,18 +42,18 @@ void Teapot::requestHandler(int *client_socket)
                 status_code = 200;
             }
         }
-
-        Response response = Response(body, "text/html", status_code);
-        raw_response = response.getRawResponse();
-        std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << std::endl;
     }
     else
     {
+        status_code = 500;
         body = Utils::readFileToBuffer(this->static_files_dir + "/500.html");
-        Response response = Response(body, "text/html", 500);
-        raw_response = response.getRawResponse();
-        std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << std::endl;
     }
+    Response response = Response(body, "text/html", status_code);
+    std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << std::endl;
+
+    cors_middleware.responseHandler(&response);
+
+    raw_response = response.getRawResponse();
 
     send(*client_socket, raw_response.c_str(), raw_response.length(), 0);
 
@@ -66,6 +68,8 @@ Teapot::Teapot()
     this->max_connections = 10;
     this->logging_type = DEFAULT;
     this->static_files_dir = "static";
+    this->sanitizer_middleware = SanitizerMiddleware();
+    this->cors_middleware = CORSMiddleware();
 }
 
 Teapot::Teapot(unsigned int port)
@@ -190,4 +194,14 @@ Teapot::~Teapot()
 void Teapot::serveFile(std::string url, std::string file_path)
 {
     this->routes.insert(std::pair<std::string, std::string>(url, file_path));
+}
+
+void Teapot::addMiddleware(CORSMiddleware cors_middleware)
+{
+    this->cors_middleware = cors_middleware;
+}
+
+void Teapot::addMiddleware(SanitizerMiddleware sanitizer_middleware)
+{
+    this->sanitizer_middleware = sanitizer_middleware;
 }

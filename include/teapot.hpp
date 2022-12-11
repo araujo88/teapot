@@ -15,11 +15,19 @@
 #include <sstream>
 #include <thread>
 #include <algorithm>
+#include <list>
+#include <optional>
+
 #include "middleware.hpp"
+#include "cors_middleware.hpp"
+#include "sanitizer_middleware.hpp"
+#include "security_middleware.hpp"
 #include "utils.hpp"
 #include "request.hpp"
 #include "response.hpp"
 #include "base_exceptions.hpp"
+#include "controller.hpp"
+#include "view.hpp"
 
 #define BUFFER_SIZE 2048
 
@@ -41,6 +49,8 @@ private:
     struct sockaddr_in server_address;
     std::map<std::string, std::string> routes;
     std::string static_files_dir;
+    CORSMiddleware cors_middleware;
+    SanitizerMiddleware sanitizer_middleware;
 
     void checkSocket();
     void checkBind();
@@ -56,7 +66,10 @@ public:
     Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir);
     void runServer();
     void serveFile(std::string url, std::string file_path);
-    void addMiddleware(Middleware middleware);
+    void addView(std::string url, Controller controller);
+    void addMiddleware(CORSMiddleware middleware);
+    void addMiddleware(SanitizerMiddleware middleware);
+
     ~Teapot();
 };
 

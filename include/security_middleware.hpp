@@ -3,7 +3,7 @@
 
 #include "middleware.hpp"
 
-class SecurityMiddleware : Middleware
+class SecurityMiddleware : public Middleware
 {
 };
 

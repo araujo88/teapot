@@ -34,6 +34,16 @@ std::string Request::getDate()
     return this->date;
 }
 
+void Request::setBody(std::string body)
+{
+    this->body = body;
+}
+
+std::string Request::getBody()
+{
+    return this->body;
+}
+
 Request::~Request()
 {
 }

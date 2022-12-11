@@ -24,16 +24,18 @@ private:
     std::string method;
     std::string raw;
     std::list<std::string> headers;
-    std::string body;
     std::string url;
     std::string http_version;
     std::string date;
+    std::string body;
 
 public:
     Request(std::string raw);
     std::string getMethod();
     std::string getUrl();
     std::string getDate();
+    std::string getBody();
+    void setBody(std::string body);
     ~Request();
 };
 
