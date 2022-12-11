@@ -19,7 +19,8 @@ void Teapot::requestHandler(int *client_socket)
     std::string body;
     unsigned int status_code;
 
-    // sanitizer_middleware.requestHandler(&request);
+    if (request.getMethod() == "POST" || request.getMethod() == "PUT")
+        this->sanitizer_middleware.requestHandler(&request);
 
     std::cout << "[" + request.getDate() + "]" + " " + request.getMethod() + " " + request.getUrl() + " HTTP/1.1 ";
     if (request.getMethod() == "GET")
@@ -51,7 +52,8 @@ void Teapot::requestHandler(int *client_socket)
     Response response = Response(body, "text/html", status_code);
     std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << std::endl;
 
-    cors_middleware.responseHandler(&response);
+    this->cors_middleware.responseHandler(&response);
+    this->security_middleware.responseHandler(&response);
 
     raw_response = response.getRawResponse();
 
@@ -70,6 +72,7 @@ Teapot::Teapot()
     this->static_files_dir = "static";
     this->sanitizer_middleware = SanitizerMiddleware();
     this->cors_middleware = CORSMiddleware();
+    this->security_middleware = SecurityMiddleware();
 }
 
 Teapot::Teapot(unsigned int port)

@@ -1,5 +1,4 @@
 #include "../include/teapot.hpp"
-#include "../include/cors_middleware.hpp"
 
 int main(int argc, char *argv[])
 {

@@ -8,7 +8,10 @@ CORSMiddleware::CORSMiddleware()
     this->allow_credentials = "true";
 }
 
-CORSMiddleware::CORSMiddleware(std::string allow_origins, std::string allow_methods, std::string allow_headers, std::string allow_credentials)
+CORSMiddleware::CORSMiddleware(std::string allow_origins,
+                               std::string allow_methods,
+                               std::string allow_headers,
+                               std::string allow_credentials)
 {
     this->allow_origins = allow_origins;
     this->allow_methods = allow_methods;

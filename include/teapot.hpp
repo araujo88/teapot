@@ -51,6 +51,7 @@ private:
     std::string static_files_dir;
     CORSMiddleware cors_middleware;
     SanitizerMiddleware sanitizer_middleware;
+    SecurityMiddleware security_middleware;
 
     void checkSocket();
     void checkBind();
@@ -69,6 +70,7 @@ public:
     void addView(std::string url, Controller controller);
     void addMiddleware(CORSMiddleware middleware);
     void addMiddleware(SanitizerMiddleware middleware);
+    void addMiddleware(SecurityMiddleware middleware);
 
     ~Teapot();
 };
