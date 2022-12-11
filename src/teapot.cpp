@@ -42,6 +42,22 @@ void Teapot::requestHandler(int *client_socket)
             {
                 content_type = "image/x-icon";
             }
+            else if (request.getUrl().substr(request.getUrl().length() - 3) == "gif")
+            {
+                content_type = "image/gif";
+            }
+            else if (request.getUrl().substr(request.getUrl().length() - 3) == "jpg")
+            {
+                content_type = "image/jpeg";
+            }
+            else if (request.getUrl().substr(request.getUrl().length() - 3) == "jpeg")
+            {
+                content_type = "image/jpeg";
+            }
+            else if (request.getUrl().substr(request.getUrl().length() - 3) == "png")
+            {
+                content_type = "image/png";
+            }
             else
             {
                 content_type = "text/html";
