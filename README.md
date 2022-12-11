@@ -18,7 +18,6 @@ In `main.cpp` file:
 int main(int argc, char *argv[])
 {
     Teapot server;
-    server.serveFile("/", "/index.html");
     server.runServer();
     return 0;
 }
@@ -34,7 +33,6 @@ To run in a different port:
 int main(int argc, char *argv[])
 {
     Teapot server = Teapot(atoi(argv[1]));
-    server.serveFile("/", "/index.html");
     server.runServer();
     return 0;
 }
@@ -51,7 +49,6 @@ Optionally, the following arguments can be provided for the server instance:
 int main(int argc, char *argv[])
 {
     Teapot server = Teapot(ip_address, port, max_connections, logging_type, static_files_dir);
-    server.serveFile("/", "/index.html");
     server.runServer();
     return 0;
 }

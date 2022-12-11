@@ -17,6 +17,7 @@ void Teapot::requestHandler(int *client_socket)
     Request request = parseRequest(client_socket);
     std::string raw_response;
     std::string body;
+    std::string content_type;
     unsigned int status_code;
 
     if (request.getMethod() == "POST" || request.getMethod() == "PUT")
@@ -28,11 +29,29 @@ void Teapot::requestHandler(int *client_socket)
         try
         {
             body = Utils::readFileToBuffer(this->static_files_dir + request.getUrl());
+            if (request.getUrl() == "/")
+            {
+                body = Utils::readFileToBuffer(this->static_files_dir + "/index.html");
+                content_type = "text/html";
+            }
+            else if (request.getUrl().substr(request.getUrl().length() - 3) == "css")
+            {
+                content_type = "text/css";
+            }
+            else if (request.getUrl().substr(request.getUrl().length() - 3) == "ico")
+            {
+                content_type = "image/x-icon";
+            }
+            else
+            {
+                content_type = "text/html";
+            }
             status_code = 200;
         }
         catch (FileNotFoundException &e)
         {
             body = Utils::readFileToBuffer(this->static_files_dir + "/404.html");
+            content_type = "text/html";
             status_code = 404;
         }
         for (auto const &[url, file_path] : this->routes)
@@ -41,6 +60,7 @@ void Teapot::requestHandler(int *client_socket)
             {
                 body = Utils::readFileToBuffer(this->static_files_dir + file_path);
                 status_code = 200;
+                content_type = "text/html";
             }
         }
     }
@@ -48,8 +68,9 @@ void Teapot::requestHandler(int *client_socket)
     {
         status_code = 500;
         body = Utils::readFileToBuffer(this->static_files_dir + "/500.html");
+        content_type = "text/html";
     }
-    Response response = Response(body, "text/html", status_code);
+    Response response = Response(body, content_type, status_code);
     std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << std::endl;
 
     this->cors_middleware.responseHandler(&response);
