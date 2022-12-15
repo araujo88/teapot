@@ -60,3 +60,11 @@ int main(int argc, char *argv[])
 `max_connections`: the maximum number of simultaneous requests. The default is `10`. <br>
 `logging_type`: the Teapot server provides three levels of logging: `DEFAULT`, `DISABLED` and `VERBOSE`. <br>
 `static_files_dir`: the relative folder path where static files are located. The default is set to `static`. <br>
+
+## TODOs
+
+  - Handle POST, PUT, HEAD requests
+  - Return JSON responses
+  - REST API format
+  - Integration with SQL databases
+  - Implement Model-View-Controller (MVC) architecture
