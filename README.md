@@ -65,6 +65,6 @@ int main(int argc, char *argv[])
 
   - Handle POST, PUT, HEAD requests
   - Return JSON responses
-  - REST API format
   - Integration with SQL databases
   - Implement Model-View-Controller (MVC) architecture
+  - REST API router mode
