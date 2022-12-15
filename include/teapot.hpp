@@ -68,9 +68,9 @@ public:
     void runServer();
     void serveFile(std::string url, std::string file_path);
     void addView(std::string url, Controller controller);
-    void addMiddleware(CORSMiddleware middleware);
-    void addMiddleware(SanitizerMiddleware middleware);
-    void addMiddleware(SecurityMiddleware middleware);
+    void addMiddleware(CORSMiddleware cors_middleware);
+    void addMiddleware(SanitizerMiddleware sanitizer_middleware);
+    void addMiddleware(SecurityMiddleware security_middleware);
 
     ~Teapot();
 };

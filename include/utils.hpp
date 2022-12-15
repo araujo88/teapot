@@ -12,6 +12,7 @@ class Utils
 public:
     static std::string readFileToBuffer(std::string filename);
     static std::string date();
+    static std::string btos(bool x);
 };
 
 #endif

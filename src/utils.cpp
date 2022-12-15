@@ -25,3 +25,10 @@ std::string Utils::date()
 
     return date;
 }
+
+std::string Utils::btos(bool x)
+{
+    if (x)
+        return "true";
+    return "false";
+}
