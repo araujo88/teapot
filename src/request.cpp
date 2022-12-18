@@ -5,7 +5,7 @@ Request::Request(std::string raw)
     this->raw = raw;
     this->date = Utils::date();
 
-    std::istringstream iss(raw);
+    std::istringstream iss(this->raw);
     std::string s;
     for (int i = 0; getline(iss, s, ' '); i++)
     {
