@@ -61,10 +61,48 @@ int main(int argc, char *argv[])
 `logging_type`: the Teapot server provides three levels of logging: `DEFAULT`, `DISABLED` and `VERBOSE`. <br>
 `static_files_dir`: the relative folder path where static files are located. The default is set to `static`. <br>
 
+## Serving files
+
+You can link a HTML file to a URL by using the method `serveFile(url, file_path)`:
+
+```
+#include "../include/teapot.hpp"
+
+int main(int argc, char *argv[])
+{
+    Teapot server;
+    server.serveFile("/example", "/example.html");
+    server.runServer();
+    return 0;
+}
+```
+
+## Adding middleware
+
+Teapot web framework provides some builtin middleware such as CORS middleware, sanitizer and security headers by default. However, they can be customized to your needs by instantiating an object and then adding it to the server instance.
+
+```
+#include "../include/teapot.hpp"
+#include "../include/cors_middleware.hpp"
+
+int main(int argc, char *argv[])
+{
+    Teapot server;
+    CORSMiddleware cors_middleware = CORSMiddleware("*", "*", "*", 86400, true);
+    server.addMiddleware(cors_middleware);
+    server.runServer();
+    return 0;
+}
+```
+
+For CORS middleware, the parameters are: `CORSMiddleware(allow_origins, allow_methods, allow_headers, max_age, allow_credentials)`.
+
+You can create your own custom middleware by inherting from the `Middleware` class which already contains the request and response handlers methods.
+
 ## TODOs
 
-  - Handle POST, PUT, HEAD requests
-  - Return JSON responses
-  - Integration with SQL databases
-  - Implement Model-View-Controller (MVC) architecture
-  - REST API router mode
+- Handle POST, PUT, HEAD requests
+- Return JSON responses
+- Integration with SQL databases
+- Implement Model-View-Controller (MVC) architecture
+- REST API router mode
