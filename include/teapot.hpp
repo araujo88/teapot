@@ -48,6 +48,9 @@ private:
     int server_socket;
     struct sockaddr_in server_address;
     std::map<std::string, std::string> routes;
+    std::map<std::string, std::string> html_responses;
+    std::map<std::string, std::string> text_responses;
+    std::map<std::string, std::string> json_responses;
     std::string static_files_dir;
     CORSMiddleware cors_middleware;
     SanitizerMiddleware sanitizer_middleware;
@@ -67,6 +70,12 @@ public:
     Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir);
     void runServer();
     void serveFile(std::string url, std::string file_path);
+    void returnPlainText(std::string url, std::string text);
+    void returnPlainText(std::string url, std::string text, unsigned int status_code);
+    void returnHTML(std::string url, std::string html);
+    void returnHTML(std::string url, std::string html, unsigned int status_code);
+    void returnJSON(std::string url, std::string json);
+    void returnJSON(std::string url, std::string json, unsigned int status_code);
     void addView(std::string url, Controller controller);
     void addMiddleware(CORSMiddleware cors_middleware);
     void addMiddleware(SanitizerMiddleware sanitizer_middleware);

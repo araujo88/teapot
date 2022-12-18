@@ -79,6 +79,15 @@ void Teapot::requestHandler(int *client_socket)
                 content_type = "text/html";
             }
         }
+        for (auto const &[url, json] : this->json_responses)
+        {
+            if (request.getUrl() == url)
+            {
+                body = json;
+                status_code = 200;
+                content_type = "application/json";
+            }
+        }
     }
     else
     {
@@ -165,6 +174,34 @@ void Teapot::runServer()
     }
 }
 
+void Teapot::serveFile(std::string url, std::string file_path)
+{
+    this->routes.insert(std::pair<std::string, std::string>(url, file_path));
+}
+
+void Teapot::returnJSON(std::string url, std::string json)
+{
+    if (!Utils::isValidJSON(json))
+        throw InvalidJSONException();
+    json = Utils::formatJSON(json);
+    this->json_responses.insert(std::pair<std::string, std::string>(url, json));
+}
+
+void Teapot::addMiddleware(CORSMiddleware cors_middleware)
+{
+    this->cors_middleware = cors_middleware;
+}
+
+void Teapot::addMiddleware(SanitizerMiddleware sanitizer_middleware)
+{
+    this->sanitizer_middleware = sanitizer_middleware;
+}
+
+void Teapot::addMiddleware(SecurityMiddleware security_middleware)
+{
+    this->security_middleware = security_middleware;
+}
+
 void Teapot::checkSocket()
 {
     if (this->server_socket < 0)
@@ -229,19 +266,4 @@ Teapot::~Teapot()
         std::cout << "Error code: " + errno << std::endl;
         exit(1);
     }
-}
-
-void Teapot::serveFile(std::string url, std::string file_path)
-{
-    this->routes.insert(std::pair<std::string, std::string>(url, file_path));
-}
-
-void Teapot::addMiddleware(CORSMiddleware cors_middleware)
-{
-    this->cors_middleware = cors_middleware;
-}
-
-void Teapot::addMiddleware(SanitizerMiddleware sanitizer_middleware)
-{
-    this->sanitizer_middleware = sanitizer_middleware;
 }

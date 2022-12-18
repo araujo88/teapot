@@ -11,4 +11,13 @@ public:
     }
 };
 
+class InvalidJSONException : public std::exception
+{
+public:
+    const char *what() const throw()
+    {
+        return "Error - JSON parsing error";
+    }
+};
+
 #endif
