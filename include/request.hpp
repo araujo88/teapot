@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <list>
+#include <map>
 #include "utils.hpp"
 
 static const std::vector<std::string> http_methods = {
@@ -23,19 +24,20 @@ class Request
 private:
     std::string method;
     std::string raw;
-    std::list<std::string> headers;
-    std::string url;
-    std::string http_version;
+    std::map<std::string, std::string> headers;
+    std::string uri;
     std::string date;
     std::string body;
 
 public:
-    Request(std::string raw);
+    Request(const std::string &raw);
     std::string getMethod();
-    std::string getUrl();
+    std::string getUri();
     std::string getDate();
     std::string getBody();
+    std::string getHeader(std::string key);
     void setBody(std::string body);
+    void printHeaders();
     ~Request();
 };
 

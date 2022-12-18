@@ -1,5 +1,26 @@
 #include "../include/teapot.hpp"
 
+std::unordered_map<std::string, std::string> Teapot::parseFormData(const std::string &data) // application/x-www-form-urlencoded
+{
+    std::unordered_map<std::string, std::string> result;
+    size_t pos = 0;
+    while (pos < data.length())
+    {
+        size_t key_end = data.find('=', pos);
+        if (key_end == std::string::npos)
+        {
+            break;
+        }
+        std::string key = data.substr(pos, key_end - pos);
+        pos = key_end + 1;
+        size_t value_end = data.find('&', pos);
+        std::string value = value_end == std::string::npos ? data.substr(pos) : data.substr(pos, value_end - pos);
+        result[key] = value;
+        pos = value_end == std::string::npos ? data.length() : value_end + 1;
+    }
+    return result;
+}
+
 Request Teapot::parseRequest(int *client_socket)
 {
     char buffer[BUFFER_SIZE];
@@ -20,41 +41,46 @@ void Teapot::requestHandler(int *client_socket)
     std::string content_type;
     unsigned int status_code;
 
-    if (request.getMethod() == "POST" || request.getMethod() == "PUT")
-        this->sanitizer_middleware.requestHandler(&request);
+    std::cout << "[" + request.getDate() + "]" + " " + request.getMethod() + " " + request.getUri() + " HTTP/1.1 ";
 
-    std::cout << "[" + request.getDate() + "]" + " " + request.getMethod() + " " + request.getUrl() + " HTTP/1.1 ";
+    if (request.getMethod() == "POST" || request.getMethod() == "PUT")
+    {
+        std::cout << "Content-type: " + request.getHeader("Content-Type") << std::endl;
+        this->sanitizer_middleware.requestHandler(&request);
+        std::cout << request.getBody() << std::endl;
+    }
+
     if (request.getMethod() == "GET")
     {
         try
         {
-            body = Utils::readFileToBuffer(this->static_files_dir + request.getUrl());
-            if (request.getUrl() == "/")
+            body = Utils::readFileToBuffer(this->static_files_dir + request.getUri());
+            if (request.getUri() == "/")
             {
                 body = Utils::readFileToBuffer(this->static_files_dir + "/index.html");
                 content_type = "text/html";
             }
-            else if (request.getUrl().substr(request.getUrl().length() - 3) == "css")
+            else if (request.getUri().substr(request.getUri().length() - 3) == "css")
             {
                 content_type = "text/css";
             }
-            else if (request.getUrl().substr(request.getUrl().length() - 3) == "ico")
+            else if (request.getUri().substr(request.getUri().length() - 3) == "ico")
             {
                 content_type = "image/x-icon";
             }
-            else if (request.getUrl().substr(request.getUrl().length() - 3) == "gif")
+            else if (request.getUri().substr(request.getUri().length() - 3) == "gif")
             {
                 content_type = "image/gif";
             }
-            else if (request.getUrl().substr(request.getUrl().length() - 3) == "jpg")
+            else if (request.getUri().substr(request.getUri().length() - 3) == "jpg")
             {
                 content_type = "image/jpeg";
             }
-            else if (request.getUrl().substr(request.getUrl().length() - 3) == "jpeg")
+            else if (request.getUri().substr(request.getUri().length() - 3) == "jpeg")
             {
                 content_type = "image/jpeg";
             }
-            else if (request.getUrl().substr(request.getUrl().length() - 3) == "png")
+            else if (request.getUri().substr(request.getUri().length() - 3) == "png")
             {
                 content_type = "image/png";
             }
@@ -72,7 +98,7 @@ void Teapot::requestHandler(int *client_socket)
         }
         for (auto const &[url, file_path] : this->routes)
         {
-            if (request.getUrl() == url)
+            if (request.getUri() == url)
             {
                 body = Utils::readFileToBuffer(this->static_files_dir + file_path);
                 status_code = 200;
@@ -81,7 +107,7 @@ void Teapot::requestHandler(int *client_socket)
         }
         for (auto const &[url, json] : this->json_responses)
         {
-            if (request.getUrl() == url)
+            if (request.getUri() == url)
             {
                 body = json;
                 status_code = 200;

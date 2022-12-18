@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <list>
 #include <optional>
+#include <unordered_map>
 
 #include "middleware.hpp"
 #include "cors_middleware.hpp"
@@ -62,6 +63,7 @@ private:
     void checkAccept(int *client_socket, struct sockaddr *client_address);
     void checkReceive(int *client_socket, char buffer[BUFFER_SIZE]);
     Request parseRequest(int *client_socket);
+    std::unordered_map<std::string, std::string> parseFormData(const std::string &data);
     void requestHandler(int *client_socket);
 
 public:

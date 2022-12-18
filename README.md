@@ -116,7 +116,6 @@ You can create your own custom middleware by inherting from the `Middleware` cla
 ## TODOs
 
 - Handle POST, PUT, HEAD requests
-- Return JSON responses
 - Integration with SQL databases
 - Implement Model-View-Controller (MVC) architecture
 - REST API router mode
