@@ -118,6 +118,15 @@ void Teapot::requestHandler(int *client_socket)
                 content_type = "application/json";
             }
         }
+        for (auto const &[url, html] : this->html_responses)
+        {
+            if (request.getUri() == url)
+            {
+                body = html;
+                status_code = 200;
+                content_type = "text/html";
+            }
+        }
     }
     else
     {
@@ -215,6 +224,11 @@ void Teapot::returnJSON(std::string url, std::string json)
         throw InvalidJSONException();
     json = Utils::formatJSON(json);
     this->json_responses.insert(std::pair<std::string, std::string>(url, json));
+}
+
+void Teapot::returnHTML(std::string url, std::string html)
+{
+    this->html_responses.insert(std::pair<std::string, std::string>(url, html));
 }
 
 void Teapot::addMiddleware(CORSMiddleware cors_middleware)

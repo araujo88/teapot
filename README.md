@@ -91,6 +91,20 @@ int main(int argc, char *argv[])
 }
 ```
 
+## Returning hard-coded HTML
+
+```
+#include "../include/teapot.hpp"
+
+int main(int argc, char *argv[])
+{
+    Teapot server;
+    server.returnHTML("/example", "<html><h1>Example</h1></html>");
+    server.runServer();
+    return 0;
+}
+```
+
 ## Adding middleware
 
 Teapot web framework provides some builtin middleware such as CORS middleware, sanitizer and security headers by default. However, they can be customized to your needs by instantiating an object and then adding it to the server instance.

@@ -7,6 +7,7 @@ int main(int argc, char *argv[])
     CORSMiddleware cors_middleware = CORSMiddleware("*", "*", "*", 86400, true);
     server.addMiddleware(cors_middleware);
     server.returnJSON("/test", "{\"name\": \"john\", \"surname\": \"doe\"}");
+    server.returnHTML("/example", "<html><h1>Example</h1></html>");
     server.runServer();
     return 0;
 }
