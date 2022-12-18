@@ -7,8 +7,8 @@ SanitizerMiddleware::SanitizerMiddleware()
 void SanitizerMiddleware::requestHandler(Request *request)
 {
     std::string body = request->getBody();
-    body.replace(body.find("<"), std::string("<").size(), "&lt;");
-    body.replace(body.find(">"), std::string(">").size(), "&gt;");
+    body = Utils::replaceString(body, "<", "&lt;");
+    body = Utils::replaceString(body, ">", "&gt;");
     request->setBody(body);
 }
 
