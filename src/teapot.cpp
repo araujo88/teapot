@@ -84,6 +84,10 @@ void Teapot::requestHandler(int *client_socket)
             {
                 content_type = "image/png";
             }
+            else if (request.getUri().substr(request.getUri().length() - 2) == "js")
+            {
+                content_type = "text/javascript";
+            }
             else
             {
                 content_type = "text/html";
