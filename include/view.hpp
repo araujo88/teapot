@@ -1,18 +1,21 @@
 #ifndef VIEW_H_
 #define VIEW_H_
 
-#include <iostream>
+#include "response.hpp"
 
 class View
 {
 private:
-    std::string url;
-    std::string filepath;
+    typedef enum _type
+    {
+        json,
+        html,
+        file
+    } type;
 
 public:
     View();
-    View(std::string raw_response);
-
+    void render(type view_type, Response response);
     ~View();
 };
 

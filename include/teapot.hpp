@@ -55,6 +55,7 @@ private:
     CORSMiddleware cors_middleware;
     SanitizerMiddleware sanitizer_middleware;
     SecurityMiddleware security_middleware;
+    std::list<Controller> controllers;
 
     void checkSocket();
     void checkBind();
@@ -63,7 +64,7 @@ private:
     void checkReceive(int *client_socket, char buffer[BUFFER_SIZE]);
     Request parseRequest(int *client_socket);
     std::unordered_map<std::string, std::string> parseFormData(const std::string &data);
-    void requestHandler(int *client_socket);
+    void mainEventLoop(int *client_socket);
 
 public:
     Teapot();
@@ -75,10 +76,10 @@ public:
     void returnHTML(std::string url, std::string html, unsigned int status_code);
     void returnJSON(std::string url, std::string json);
     void returnJSON(std::string url, std::string json, unsigned int status_code);
-    void addView(std::string url, Controller controller);
     void addMiddleware(CORSMiddleware cors_middleware);
     void addMiddleware(SanitizerMiddleware sanitizer_middleware);
     void addMiddleware(SecurityMiddleware security_middleware);
+    void addController(Controller controller);
     ~Teapot();
 };
 

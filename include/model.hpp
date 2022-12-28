@@ -3,18 +3,20 @@
 
 #include <string>
 
-class Person
+class Model
 {
 private:
     std::string name;
     std::string surname;
 
-    Person();
+public:
+    Model();
+    Model(std::string name, std::string surname);
     std::string getName();
     std::string getSurname();
     void setName(std::string name);
     void setSurname(std::string surname);
-    ~Person();
+    ~Model();
 };
 
 #endif

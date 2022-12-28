@@ -33,7 +33,7 @@ Request Teapot::parseRequest(int *client_socket)
     return Request(raw_request);
 }
 
-void Teapot::requestHandler(int *client_socket)
+void Teapot::mainEventLoop(int *client_socket)
 {
     Request request = parseRequest(client_socket);
     std::string raw_response;
@@ -208,7 +208,7 @@ void Teapot::runServer()
 
         checkAccept(client_socket, (struct sockaddr *)client_address);
 
-        std::thread th(&Teapot::requestHandler, this, client_socket);
+        std::thread th(&Teapot::mainEventLoop, this, client_socket);
         th.join();
     }
 }
