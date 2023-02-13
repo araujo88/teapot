@@ -21,7 +21,8 @@ public:
                        std::string x_content_type_options,
                        std::string x_frame_options,
                        std::string x_xss_protection);
-    void responseHandler(Response *response);
+    virtual void requestHandler(Request *request) override;
+    virtual void responseHandler(Response *response) override;
     ~SecurityMiddleware();
 };
 

@@ -22,6 +22,10 @@ CORSMiddleware::CORSMiddleware(std::string allow_origins,
     this->allow_credentials = allow_credentials;
 }
 
+void CORSMiddleware::requestHandler(Request *request)
+{
+}
+
 void CORSMiddleware::responseHandler(Response *response)
 {
     response->addHeader("Access-Control-Allow-Origin: " + this->allow_origins);

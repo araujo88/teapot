@@ -10,8 +10,8 @@ class SanitizerMiddleware : public Middleware
 public:
     SanitizerMiddleware();
     ~SanitizerMiddleware();
-    void requestHandler(Request *request);
-    void responseHandler(Response *response);
+    virtual void requestHandler(Request *request) override;
+    virtual void responseHandler(Response *response) override;
 };
 
 #endif

@@ -25,6 +25,10 @@ SecurityMiddleware::SecurityMiddleware(std::string cross_origin_opener_policy,
     this->x_xss_protection = x_xss_protection;
 }
 
+void SecurityMiddleware::requestHandler(Request *request)
+{
+}
+
 void SecurityMiddleware::responseHandler(Response *response)
 {
     response->addHeader("Cross-Origin-Opener-Policy: " + this->cross_origin_opener_policy);

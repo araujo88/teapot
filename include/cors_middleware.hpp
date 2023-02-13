@@ -23,7 +23,8 @@ public:
                    unsigned int max_age,
                    bool allow_credentials);
     ~CORSMiddleware();
-    void responseHandler(Response *response);
+    virtual void requestHandler(Request *request) override;
+    virtual void responseHandler(Response *response) override;
 };
 
 #endif

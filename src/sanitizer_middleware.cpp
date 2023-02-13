@@ -12,6 +12,10 @@ void SanitizerMiddleware::requestHandler(Request *request)
     request->setBody(body);
 }
 
+void SanitizerMiddleware::responseHandler(Response *response)
+{
+}
+
 SanitizerMiddleware::~SanitizerMiddleware()
 {
 }
