@@ -32,7 +32,7 @@ To run in a different port:
 
 int main(int argc, char *argv[])
 {
-    tpt::Teapot server = Teapot(atoi(argv[1]));
+    tpt::Teapot server = tpt::Teapot(atoi(argv[1]));
     server.runServer();
     return 0;
 }
@@ -48,7 +48,7 @@ Optionally, the following arguments can be provided for the server instance:
 
 int main(int argc, char *argv[])
 {
-    tpt::Teapot server = Teapot(ip_address, port, max_connections, logging_type, static_files_dir);
+    tpt::Teapot server = tpt::Teapot(ip_address, port, max_connections, logging_type, static_files_dir);
     server.runServer();
     return 0;
 }
