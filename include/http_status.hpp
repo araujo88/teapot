@@ -6,10 +6,13 @@
 #include <vector>
 #include <iterator>
 
-class HttpStatus
+namespace tpt
 {
-public:
-    static std::string description(int status_code);
-};
+    class HttpStatus
+    {
+    public:
+        static std::string description(int status_code);
+    };
+}
 
 #endif

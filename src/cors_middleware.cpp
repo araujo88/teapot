@@ -1,5 +1,7 @@
 #include "../include/cors_middleware.hpp"
 
+using namespace tpt;
+
 CORSMiddleware::CORSMiddleware()
 {
     this->allow_origins = "127.0.0.1";

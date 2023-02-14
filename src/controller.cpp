@@ -1,5 +1,7 @@
 #include "../include/controller.hpp"
 
+using namespace tpt;
+
 Controller::Controller(Model model, View view)
 {
     this->model = model;

@@ -18,6 +18,7 @@
 #include <list>
 #include <optional>
 #include <unordered_map>
+#include <memory>
 
 #include "middleware.hpp"
 #include "cors_middleware.hpp"
@@ -32,55 +33,58 @@
 
 #define BUFFER_SIZE 2048
 
-class Teapot
+namespace tpt
 {
-private:
-    typedef enum _logging
+    class Teapot
     {
-        DEFAULT,
-        NORMAL,
-        VERBOSE
-    } logging;
+    private:
+        typedef enum _logging
+        {
+            DEFAULT,
+            NORMAL,
+            VERBOSE
+        } logging;
 
-    logging logging_type;
-    std::string ip_address;
-    unsigned int port;
-    unsigned int max_connections;
-    int server_socket;
-    struct sockaddr_in server_address;
-    std::map<std::string, std::string> routes;
-    std::map<std::string, std::string> html_responses;
-    std::map<std::string, std::string> json_responses;
-    std::string static_files_dir;
-    CORSMiddleware cors_middleware;
-    SanitizerMiddleware sanitizer_middleware;
-    SecurityMiddleware security_middleware;
-    std::list<Controller> controllers;
+        logging logging_type;
+        std::string ip_address;
+        unsigned int port;
+        unsigned int max_connections;
+        int server_socket;
+        struct sockaddr_in server_address;
+        std::map<std::string, std::string> routes;
+        std::map<std::string, std::string> html_responses;
+        std::map<std::string, std::string> json_responses;
+        std::string static_files_dir;
+        CORSMiddleware cors_middleware;
+        SanitizerMiddleware sanitizer_middleware;
+        SecurityMiddleware security_middleware;
+        std::list<Controller> controllers;
 
-    void checkSocket();
-    void checkBind();
-    void checkListen();
-    void checkAccept(int *client_socket, struct sockaddr *client_address);
-    void checkReceive(int *client_socket, char buffer[BUFFER_SIZE]);
-    Request parseRequest(int *client_socket);
-    std::unordered_map<std::string, std::string> parseFormData(const std::string &data);
-    void mainEventLoop(int *client_socket);
+        void checkSocket();
+        void checkBind();
+        void checkListen();
+        void checkAccept(std::unique_ptr<int> &client_socket, std::unique_ptr<struct sockaddr> &client_address);
+        void checkReceive(std::unique_ptr<int> &client_socket, char buffer[BUFFER_SIZE]);
+        Request parseRequest(std::unique_ptr<int> &client_socket);
+        std::unordered_map<std::string, std::string> parseFormData(const std::string &data);
+        void mainEventLoop(std::unique_ptr<int> &client_socket);
 
-public:
-    Teapot();
-    Teapot(unsigned int port);
-    Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir);
-    void runServer();
-    void serveFile(std::string url, std::string file_path);
-    void returnHTML(std::string url, std::string html);
-    void returnHTML(std::string url, std::string html, unsigned int status_code);
-    void returnJSON(std::string url, std::string json);
-    void returnJSON(std::string url, std::string json, unsigned int status_code);
-    void addMiddleware(CORSMiddleware cors_middleware);
-    void addMiddleware(SanitizerMiddleware sanitizer_middleware);
-    void addMiddleware(SecurityMiddleware security_middleware);
-    void addController(Controller controller);
-    ~Teapot();
-};
+    public:
+        Teapot();
+        Teapot(unsigned int port);
+        Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir);
+        void runServer();
+        void serveFile(std::string url, std::string file_path);
+        void returnHTML(std::string url, std::string html);
+        void returnHTML(std::string url, std::string html, unsigned int status_code);
+        void returnJSON(std::string url, std::string json);
+        void returnJSON(std::string url, std::string json, unsigned int status_code);
+        void addMiddleware(CORSMiddleware cors_middleware);
+        void addMiddleware(SanitizerMiddleware sanitizer_middleware);
+        void addMiddleware(SecurityMiddleware security_middleware);
+        void addController(Controller controller);
+        ~Teapot();
+    };
+}
 
 #endif

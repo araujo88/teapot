@@ -6,16 +6,19 @@
 #include "request.hpp"
 #include "response.hpp"
 
-class Controller
+namespace tpt
 {
-private:
-    Model model;
-    View view;
+    class Controller
+    {
+    private:
+        Model model;
+        View view;
 
-public:
-    Controller(Model model, View view);
-    Response handler(Request request);
-    ~Controller();
-};
+    public:
+        Controller(Model model, View view);
+        Response handler(Request request);
+        ~Controller();
+    };
+}
 
 #endif

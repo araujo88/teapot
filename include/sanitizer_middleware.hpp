@@ -5,13 +5,16 @@
 #include "request.hpp"
 #include "response.hpp"
 
-class SanitizerMiddleware : public Middleware
+namespace tpt
 {
-public:
-    SanitizerMiddleware();
-    ~SanitizerMiddleware();
-    virtual void requestHandler(Request *request) override;
-    virtual void responseHandler(Response *response) override;
-};
+    class SanitizerMiddleware : public Middleware
+    {
+    public:
+        SanitizerMiddleware();
+        ~SanitizerMiddleware();
+        virtual void requestHandler(Request *request) override;
+        virtual void responseHandler(Response *response) override;
+    };
+}
 
 #endif

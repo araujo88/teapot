@@ -1,5 +1,7 @@
 #include "../include/http_status.hpp"
 
+using namespace tpt;
+
 std::string HttpStatus::description(int status_code)
 {
     std::vector<std::pair<int, std::string>> http_status =

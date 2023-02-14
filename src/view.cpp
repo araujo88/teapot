@@ -1,5 +1,7 @@
 #include "../include/view.hpp"
 
+using namespace tpt;
+
 View::View()
 {
 }

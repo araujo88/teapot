@@ -1,5 +1,7 @@
 #include "../include/model.hpp"
 
+using namespace tpt;
+
 Model::Model()
 {
 }

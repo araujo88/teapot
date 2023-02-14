@@ -6,25 +6,28 @@
 #include "response.hpp"
 #include "utils.hpp"
 
-class CORSMiddleware : public Middleware
+namespace tpt
 {
-private:
-    std::string allow_origins;
-    std::string allow_methods;
-    std::string allow_headers;
-    unsigned int max_age;
-    bool allow_credentials;
+    class CORSMiddleware : public Middleware
+    {
+    private:
+        std::string allow_origins;
+        std::string allow_methods;
+        std::string allow_headers;
+        unsigned int max_age;
+        bool allow_credentials;
 
-public:
-    CORSMiddleware();
-    CORSMiddleware(std::string allow_origins,
-                   std::string allow_methods,
-                   std::string allow_headers,
-                   unsigned int max_age,
-                   bool allow_credentials);
-    ~CORSMiddleware();
-    virtual void requestHandler(Request *request) override;
-    virtual void responseHandler(Response *response) override;
-};
+    public:
+        CORSMiddleware();
+        CORSMiddleware(std::string allow_origins,
+                       std::string allow_methods,
+                       std::string allow_headers,
+                       unsigned int max_age,
+                       bool allow_credentials);
+        ~CORSMiddleware();
+        virtual void requestHandler(Request *request) override;
+        virtual void responseHandler(Response *response) override;
+    };
+}
 
 #endif

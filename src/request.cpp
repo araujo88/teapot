@@ -1,5 +1,7 @@
 #include "../include/request.hpp"
 
+using namespace tpt;
+
 Request::Request(const std::string &raw)
 {
     this->raw = raw;

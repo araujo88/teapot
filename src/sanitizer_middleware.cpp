@@ -1,5 +1,7 @@
 #include "../include/sanitizer_middleware.hpp"
 
+using namespace tpt;
+
 SanitizerMiddleware::SanitizerMiddleware()
 {
 }

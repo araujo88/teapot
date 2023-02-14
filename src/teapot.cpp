@@ -1,5 +1,7 @@
 #include "../include/teapot.hpp"
 
+using namespace tpt;
+
 std::unordered_map<std::string, std::string> Teapot::parseFormData(const std::string &data) // application/x-www-form-urlencoded
 {
     std::unordered_map<std::string, std::string> result;
@@ -21,7 +23,7 @@ std::unordered_map<std::string, std::string> Teapot::parseFormData(const std::st
     return result;
 }
 
-Request Teapot::parseRequest(int *client_socket)
+Request Teapot::parseRequest(std::unique_ptr<int> &client_socket)
 {
     char buffer[BUFFER_SIZE];
     std::string raw_request;
@@ -33,7 +35,7 @@ Request Teapot::parseRequest(int *client_socket)
     return Request(raw_request);
 }
 
-void Teapot::mainEventLoop(int *client_socket)
+void Teapot::mainEventLoop(std::unique_ptr<int> &client_socket)
 {
     Request request = parseRequest(client_socket);
     std::string raw_response;
@@ -145,7 +147,6 @@ void Teapot::mainEventLoop(int *client_socket)
     send(*client_socket, raw_response.c_str(), raw_response.length(), 0);
 
     close(*client_socket);
-    delete client_socket;
 }
 
 Teapot::Teapot()
@@ -203,12 +204,13 @@ void Teapot::runServer()
     {
         checkListen();
 
-        int *client_socket = new int;
-        struct sockaddr_in *client_address = NULL;
+        std::unique_ptr<int> client_socket = std::make_unique<int>();
+        std::unique_ptr<struct sockaddr> client_address = nullptr;
+        // std::unique_ptr<struct sockaddr> client_sockaddr(reinterpret_cast<struct sockaddr *>(client_address.release()));
 
-        checkAccept(client_socket, (struct sockaddr *)client_address);
+        checkAccept(client_socket, client_address);
 
-        std::thread th(&Teapot::mainEventLoop, this, client_socket);
+        std::thread th(&Teapot::mainEventLoop, this, std::ref(client_socket));
         th.join();
     }
 }
@@ -276,9 +278,9 @@ void Teapot::checkListen()
     }
 }
 
-void Teapot::checkAccept(int *client_socket, struct sockaddr *client_address)
+void Teapot::checkAccept(std::unique_ptr<int> &client_socket, std::unique_ptr<struct sockaddr> &client_address)
 {
-    if ((*client_socket = accept(this->server_socket, (struct sockaddr *)client_address, (socklen_t *)sizeof(client_address))) < 0)
+    if ((*client_socket = accept(this->server_socket, (struct sockaddr *)client_address.get(), (socklen_t *)sizeof(client_address))) < 0)
     {
         perror("Accept failed");
         std::cout << "Error code: " + errno << std::endl;
@@ -286,7 +288,7 @@ void Teapot::checkAccept(int *client_socket, struct sockaddr *client_address)
     }
 }
 
-void Teapot::checkReceive(int *client_socket, char buffer[BUFFER_SIZE])
+void Teapot::checkReceive(std::unique_ptr<int> &client_socket, char buffer[BUFFER_SIZE])
 {
     if ((recv(*client_socket, (void *)buffer, BUFFER_SIZE, 0)) < 0)
     {

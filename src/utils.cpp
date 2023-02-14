@@ -1,5 +1,7 @@
 #include "../include/utils.hpp"
 
+using namespace tpt;
+
 std::string Utils::readFileToBuffer(std::string filename)
 {
     std::ifstream file;

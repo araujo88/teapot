@@ -1,5 +1,7 @@
 #include "../include/security_middleware.hpp"
 
+using namespace tpt;
+
 SecurityMiddleware::SecurityMiddleware()
 {
     this->cross_origin_opener_policy = "same-origin";

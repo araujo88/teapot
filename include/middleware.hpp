@@ -4,13 +4,16 @@
 #include "request.hpp"
 #include "response.hpp"
 
-class Middleware
+namespace tpt
 {
-public:
-    Middleware();
-    virtual void requestHandler(Request *request);
-    virtual void responseHandler(Response *response);
-    ~Middleware();
-};
+    class Middleware
+    {
+    public:
+        Middleware();
+        virtual void requestHandler(Request *request);
+        virtual void responseHandler(Response *response);
+        ~Middleware();
+    };
+}
 
 #endif

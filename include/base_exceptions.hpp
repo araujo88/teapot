@@ -2,22 +2,25 @@
 #define BASE_EXCEPTIONS_H_
 #include <exception>
 
-class FileNotFoundException : public std::exception
+namespace tpt
 {
-public:
-    const char *what() const throw()
+    class FileNotFoundException : public std::exception
     {
-        return "Error - file not found";
-    }
-};
+    public:
+        const char *what() const throw()
+        {
+            return "Error - file not found";
+        }
+    };
 
-class InvalidJSONException : public std::exception
-{
-public:
-    const char *what() const throw()
+    class InvalidJSONException : public std::exception
     {
-        return "Error - JSON parsing error";
-    }
-};
+    public:
+        const char *what() const throw()
+        {
+            return "Error - JSON parsing error";
+        }
+    };
+}
 
 #endif

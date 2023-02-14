@@ -1,5 +1,7 @@
 #include "../include/response.hpp"
 
+using namespace tpt;
+
 Response::Response(std::string body, std::string content_type, unsigned int status_code)
 {
     HttpStatus http_status;

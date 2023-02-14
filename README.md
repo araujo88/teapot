@@ -17,7 +17,7 @@ In `main.cpp` file:
 
 int main(int argc, char *argv[])
 {
-    Teapot server;
+    tpt::Teapot server;
     server.runServer();
     return 0;
 }
@@ -32,7 +32,7 @@ To run in a different port:
 
 int main(int argc, char *argv[])
 {
-    Teapot server = Teapot(atoi(argv[1]));
+    tpt::Teapot server = Teapot(atoi(argv[1]));
     server.runServer();
     return 0;
 }
@@ -48,7 +48,7 @@ Optionally, the following arguments can be provided for the server instance:
 
 int main(int argc, char *argv[])
 {
-    Teapot server = Teapot(ip_address, port, max_connections, logging_type, static_files_dir);
+    tpt::Teapot server = Teapot(ip_address, port, max_connections, logging_type, static_files_dir);
     server.runServer();
     return 0;
 }
@@ -70,7 +70,7 @@ You can link a HTML file to a URL by using the method `serveFile(url, file_path)
 
 int main(int argc, char *argv[])
 {
-    Teapot server;
+    tpt::Teapot server;
     server.serveFile("/example", "/example.html");
     server.runServer();
     return 0;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    Teapot server;
+    tpt::Teapot server;
     server.returnJSON("/test", "{\"name\": \"john\", \"surname\": \"doe\"}");
     server.runServer();
     return 0;
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    Teapot server;
+    tpt::Teapot server;
     server.returnHTML("/example", "<html><h1>Example</h1></html>");
     server.runServer();
     return 0;
@@ -115,8 +115,8 @@ Teapot web framework provides some builtin middleware such as CORS middleware, s
 
 int main(int argc, char *argv[])
 {
-    Teapot server;
-    CORSMiddleware cors_middleware = CORSMiddleware("*", "*", "*", 86400, true);
+    tpt::Teapot server;
+    tpt::CORSMiddleware cors_middleware = tpt::CORSMiddleware("*", "*", "*", 86400, true);
     server.addMiddleware(cors_middleware);
     server.runServer();
     return 0;

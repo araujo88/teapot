@@ -3,20 +3,23 @@
 
 #include "response.hpp"
 
-class View
+namespace tpt
 {
-private:
-    typedef enum _type
+    class View
     {
-        json,
-        html,
-        file
-    } type;
+    private:
+        typedef enum _type
+        {
+            json,
+            html,
+            file
+        } type;
 
-public:
-    View();
-    void render(type view_type, Response response);
-    ~View();
-};
+    public:
+        View();
+        void render(type view_type, Response response);
+        ~View();
+    };
+}
 
 #endif
