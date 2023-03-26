@@ -210,8 +210,7 @@ void Teapot::runServer()
 
         checkAccept(client_socket, client_address);
 
-        std::thread th(&Teapot::mainEventLoop, this, std::ref(client_socket));
-        th.join();
+        std::jthread th(&Teapot::mainEventLoop, this, std::ref(client_socket));
     }
 }
 

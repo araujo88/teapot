@@ -1,5 +1,5 @@
 CC=g++
-CC_FLAGS=-g -Wall
+CC_FLAGS=-g -Wall -std=c++20
 
 SRC_DIR=src
 HDR_DIR=include
