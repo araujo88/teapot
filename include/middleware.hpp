@@ -9,10 +9,8 @@ namespace tpt
     class Middleware
     {
     public:
-        Middleware();
-        virtual void requestHandler(Request *request);
-        virtual void responseHandler(Response *response);
-        ~Middleware();
+        virtual void requestHandler(Request *request) = 0;
+        virtual void responseHandler(Response *response) = 0;
     };
 }
 
