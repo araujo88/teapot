@@ -1,5 +1,5 @@
 CC=g++
-CC_FLAGS=-g -Wall -std=c++20
+CC_FLAGS=-g -Wall -Wpedantic -Wextra -std=c++20
 
 SRC_DIR=src
 HDR_DIR=include
@@ -24,3 +24,4 @@ $(OBJ_DIR):
 
 clean:
 	rm -rf $(BIN_FILE) $(OBJ_DIR) teapot
+
