@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <string>
 #include <stack>
+#include <unordered_map>
 #include "base_exceptions.hpp"
 
 namespace tpt
@@ -20,6 +21,7 @@ namespace tpt
         static std::string &replaceString(std::string &s, const std::string &from, const std::string &to);
         static std::string &formatJSON(std::string &json);
         static bool isValidJSON(const std::string &str);
+        static std::string formatFormDataToJson(std::unordered_map<std::string, std::string> formData);
     };
 }
 

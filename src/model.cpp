@@ -2,16 +2,27 @@
 
 using namespace tpt;
 
+unsigned int tpt::Model::count = 0;
+
 Model::Model()
 {
     this->name = "John";
     this->surname = "Doe";
+    this->id = count;
+    count++;
 }
 
 Model::Model(std::string name, std::string surname)
 {
     this->name = name;
     this->surname = surname;
+    this->id = count;
+    count++;
+}
+
+unsigned int Model::getId()
+{
+    return this->id;
 }
 
 std::string Model::getName()

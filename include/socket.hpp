@@ -1,7 +1,5 @@
-#ifndef SOCKET_H_
-#define SOCKET_H_
-
-#include "address.hpp"
+#ifndef ISOCKET_H_
+#define ISOCKET_H_
 
 namespace tpt
 {

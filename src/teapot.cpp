@@ -24,6 +24,12 @@ std::unordered_map<std::string, std::string> Teapot::parseFormData(const std::st
     return result;
 }
 
+Model Teapot::extractAndStore(const std::string &requestBody)
+{
+    auto formData = this->parseFormData(requestBody);
+    return Model{formData["name"], formData["surname"]};
+}
+
 Request Teapot::parseRequest(int client_socket)
 {
     char buffer[BUFFER_SIZE];
@@ -130,6 +136,22 @@ void Teapot::mainEventLoop(int client_socket)
                 content_type = "text/html";
             }
         }
+    }
+    else if (request.getMethod() == "POST")
+    {
+        db::JsonDatabase database = db::JsonDatabase("db.json");
+        auto data = parseFormData(request.getBody());
+        Model model = extractAndStore(request.getBody());
+
+        std::unordered_map<std::string, std::string> newEntry = {
+            {"id", std::to_string(model.getId())},
+            {"name", model.getName()},
+            {"surname", model.getSurname()}};
+
+        database.write(Utils::formatFormDataToJson(newEntry));
+        status_code = 201;
+        body = Utils::readFileToBuffer(this->static_files_dir + "/201.html");
+        content_type = "text/html";
     }
     else
     {

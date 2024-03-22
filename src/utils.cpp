@@ -110,3 +110,23 @@ bool Utils::isValidJSON(const std::string &str)
         return !in_string && brackets.empty();
     }
 }
+
+std::string Utils::formatFormDataToJson(std::unordered_map<std::string, std::string> formData)
+{
+    std::stringstream json;
+    json << "{";
+
+    bool isFirst = true; // Flag to handle comma placement
+    for (const auto &pair : formData)
+    {
+        if (!isFirst)
+        {
+            json << ", ";
+        }
+        json << "\"" << pair.first << "\": \"" << pair.second << "\"";
+        isFirst = false;
+    }
+
+    json << "}";
+    return json.str();
+}

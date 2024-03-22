@@ -31,6 +31,7 @@
 #include "controller.hpp"
 #include "view.hpp"
 #include "unix_socket.hpp"
+#include "json_database.hpp"
 
 #define BUFFER_SIZE 2048
 
@@ -80,6 +81,7 @@ namespace tpt
         void addMiddleware(SanitizerMiddleware sanitizer_middleware);
         void addMiddleware(SecurityMiddleware security_middleware);
         void addController(Controller controller);
+        Model extractAndStore(const std::string &requestBody);
         ~Teapot();
     };
 }

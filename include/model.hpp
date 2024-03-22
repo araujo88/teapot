@@ -9,6 +9,7 @@ namespace tpt
     {
     private:
         unsigned int id;
+        static unsigned int count;
         std::string name;
         std::string surname;
 
