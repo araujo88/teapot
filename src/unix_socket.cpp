@@ -93,11 +93,11 @@ void UnixSocket::bindSocket()
         exit(EXIT_FAILURE);
     }
     std::cout << "Binding done!" << std::endl;
+    std::cout << "Listening to connections ..." << std::endl;
 }
 
 void UnixSocket::listenToConnections()
 {
-    std::cout << "Listening to connections ..." << std::endl;
     if ((listen(this->server_socket, this->max_connections)) < 0)
     {
         perror("Listen failed");
@@ -106,7 +106,7 @@ void UnixSocket::listenToConnections()
     }
 }
 
-void UnixSocket::acceptConnection(int &client_socket, struct sockaddr_in &client_address)
+void UnixSocket::acceptConnection(int &client_socket, void *client_address)
 {
     socklen_t client_addr_size = sizeof(client_address);
     client_socket = accept(this->server_socket, (struct sockaddr *)&client_address, &client_addr_size);

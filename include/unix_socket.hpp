@@ -30,7 +30,7 @@ namespace tpt
         ~UnixSocket();
         virtual void bindSocket() override;
         virtual void listenToConnections() override;
-        void acceptConnection(int &client_socket, struct sockaddr_in &client_address);
+        virtual void acceptConnection(int &client_socket, void *client_address) override;
         virtual void receive(int client_socket, char *buffer, unsigned int buffer_size) override;
         virtual void closeSocket() override;
     };

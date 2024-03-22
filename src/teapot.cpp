@@ -191,7 +191,7 @@ void Teapot::runServer()
         socket.listenToConnections();
 
         int client_socket_fd;
-        struct sockaddr_in client_addr;
+        void *client_addr = nullptr;
 
         socket.acceptConnection(client_socket_fd, client_addr);
 
