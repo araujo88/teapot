@@ -1,4 +1,5 @@
 #include "../include/teapot.hpp"
+#include "../include/unix_socket.hpp"
 
 using namespace tpt;
 
@@ -23,19 +24,19 @@ std::unordered_map<std::string, std::string> Teapot::parseFormData(const std::st
     return result;
 }
 
-Request Teapot::parseRequest(std::unique_ptr<int> &client_socket)
+Request Teapot::parseRequest(int client_socket)
 {
     char buffer[BUFFER_SIZE];
     std::string raw_request;
 
-    checkReceive(client_socket, buffer);
+    this->socket.receive(client_socket, buffer, BUFFER_SIZE);
 
     raw_request = std::string(buffer);
 
     return Request(raw_request);
 }
 
-void Teapot::mainEventLoop(std::unique_ptr<int> &client_socket)
+void Teapot::mainEventLoop(int client_socket)
 {
     Request request = parseRequest(client_socket);
     std::string raw_response;
@@ -144,9 +145,9 @@ void Teapot::mainEventLoop(std::unique_ptr<int> &client_socket)
 
     raw_response = response.getRawResponse();
 
-    send(*client_socket, raw_response.c_str(), raw_response.length(), 0);
+    send(client_socket, raw_response.c_str(), raw_response.length(), 0);
 
-    close(*client_socket);
+    close(client_socket);
 }
 
 Teapot::Teapot()
@@ -168,6 +169,7 @@ Teapot::Teapot(unsigned int port)
     this->max_connections = 10;
     this->logging_type = DEFAULT;
     this->static_files_dir = "static";
+    this->socket = tpt::UnixSocket(port);
 }
 
 Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir)
@@ -177,40 +179,23 @@ Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_conne
     this->max_connections = max_connections;
     this->logging_type = logging_type;
     this->static_files_dir = static_files_dir;
+    this->socket = tpt::UnixSocket(ip_address, port, max_connections);
 }
 
 void Teapot::runServer()
 {
-
-    std::cout << "Creating socket ..." << std::endl;
-    this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
-
-    checkSocket();
-
-    std::cout << "Socket created!" << std::endl;
-
-    this->server_address.sin_family = AF_INET;
-    this->server_address.sin_port = htons(this->port);
-    this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
-
-    std::cout << "Binding socket ..." << std::endl;
-
-    checkBind();
-
-    std::cout << "Binding done!" << std::endl;
-    std::cout << "Waiting for incoming requests..." << std::endl;
+    socket.bindSocket();
 
     while (true)
     {
-        checkListen();
+        socket.listenToConnections();
 
-        std::unique_ptr<int> client_socket = std::make_unique<int>();
-        std::unique_ptr<struct sockaddr> client_address = nullptr;
-        // std::unique_ptr<struct sockaddr> client_sockaddr(reinterpret_cast<struct sockaddr *>(client_address.release()));
+        int client_socket_fd;
+        struct sockaddr_in client_addr;
 
-        checkAccept(client_socket, client_address);
+        socket.acceptConnection(client_socket_fd, client_addr);
 
-        std::jthread th(&Teapot::mainEventLoop, this, std::ref(client_socket));
+        std::jthread th(&Teapot::mainEventLoop, this, client_socket_fd);
     }
 }
 
@@ -247,68 +232,7 @@ void Teapot::addMiddleware(SecurityMiddleware security_middleware)
     this->security_middleware = security_middleware;
 }
 
-void Teapot::checkSocket()
-{
-    if (this->server_socket < 0)
-    {
-        perror("Socket failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(1);
-    }
-}
-
-void Teapot::checkBind()
-{
-    if ((bind(this->server_socket, (struct sockaddr *)&this->server_address, sizeof(this->server_address))) < 0)
-    {
-        perror("Bind failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(1);
-    }
-}
-
-void Teapot::checkListen()
-{
-    if ((listen(this->server_socket, this->max_connections)) < 0)
-    {
-        perror("Listen failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(1);
-    }
-}
-
-void Teapot::checkAccept(std::unique_ptr<int> &client_socket, std::unique_ptr<struct sockaddr> &client_address)
-{
-    if ((*client_socket = accept(this->server_socket, (struct sockaddr *)client_address.get(), (socklen_t *)sizeof(client_address))) < 0)
-    {
-        perror("Accept failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(1);
-    }
-}
-
-void Teapot::checkReceive(std::unique_ptr<int> &client_socket, char buffer[BUFFER_SIZE])
-{
-    if ((recv(*client_socket, (void *)buffer, BUFFER_SIZE, 0)) < 0)
-    {
-        perror("Receive error");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(1);
-    }
-}
-
 Teapot::~Teapot()
 {
-    std::cout << "Closing socket ..." << std::endl;
-    if (close(this->server_socket) == 0)
-    {
-        std::cout << "Socket closed!" << std::endl;
-        exit(0);
-    }
-    else
-    {
-        perror("An error occurred while closing the socket: ");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(1);
-    }
+    this->socket.closeSocket();
 }

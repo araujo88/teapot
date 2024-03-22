@@ -7,7 +7,7 @@
 
 namespace tpt
 {
-    class SanitizerMiddleware : public Middleware
+    class SanitizerMiddleware : public IMiddleware
     {
     public:
         SanitizerMiddleware();

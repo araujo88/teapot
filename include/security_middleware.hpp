@@ -5,7 +5,7 @@
 
 namespace tpt
 {
-    class SecurityMiddleware : public Middleware
+    class SecurityMiddleware : public IMiddleware
     {
     private:
         std::string cross_origin_opener_policy;

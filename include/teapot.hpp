@@ -30,6 +30,7 @@
 #include "base_exceptions.hpp"
 #include "controller.hpp"
 #include "view.hpp"
+#include "unix_socket.hpp"
 
 #define BUFFER_SIZE 2048
 
@@ -59,15 +60,11 @@ namespace tpt
         SanitizerMiddleware sanitizer_middleware;
         SecurityMiddleware security_middleware;
         std::list<Controller> controllers;
+        tpt::UnixSocket socket;
 
-        void checkSocket();
-        void checkBind();
-        void checkListen();
-        void checkAccept(std::unique_ptr<int> &client_socket, std::unique_ptr<struct sockaddr> &client_address);
-        void checkReceive(std::unique_ptr<int> &client_socket, char buffer[BUFFER_SIZE]);
-        Request parseRequest(std::unique_ptr<int> &client_socket);
+        Request parseRequest(int client_socket);
         std::unordered_map<std::string, std::string> parseFormData(const std::string &data);
-        void mainEventLoop(std::unique_ptr<int> &client_socket);
+        void mainEventLoop(int client_socket);
 
     public:
         Teapot();

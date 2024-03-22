@@ -6,7 +6,7 @@
 
 namespace tpt
 {
-    class Middleware
+    class IMiddleware
     {
     public:
         virtual void requestHandler(Request *request) = 0;

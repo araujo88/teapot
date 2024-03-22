@@ -8,7 +8,7 @@
 
 namespace tpt
 {
-    class CORSMiddleware : public Middleware
+    class CORSMiddleware : public IMiddleware
     {
     private:
         std::string allow_origins;
