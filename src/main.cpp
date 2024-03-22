@@ -10,8 +10,10 @@ int main(int argc, char *argv[])
     }
     tpt::Teapot server = tpt::Teapot(atoi(argv[1]));
     tpt::CORSMiddleware cors_middleware = tpt::CORSMiddleware("*", "*", "*", 86400, true);
+    tpt::SecurityMiddleware security_middleware;
 
     server.addMiddleware(cors_middleware);
+    server.addMiddleware(security_middleware);
     server.returnJSON("/test", "{\"name\": \"john\", \"surname\": \"doe\"}");
     server.returnHTML("/example", "<html><h1>Example</h1></html>");
     server.runServer();
