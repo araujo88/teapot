@@ -8,6 +8,7 @@
 #include <string>
 #include <stack>
 #include <unordered_map>
+#include <vector>
 #include "base_exceptions.hpp"
 
 namespace tpt
@@ -22,6 +23,7 @@ namespace tpt
         static std::string &formatJSON(std::string &json);
         static bool isValidJSON(const std::string &str);
         static std::string formatFormDataToJson(std::unordered_map<std::string, std::string> formData);
+        static std::vector<std::unordered_map<std::string, std::string>> parseJsonArray(const std::string &json);
     };
 }
 

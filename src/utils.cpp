@@ -130,3 +130,77 @@ std::string Utils::formatFormDataToJson(std::unordered_map<std::string, std::str
     json << "}";
     return json.str();
 }
+std::vector<std::unordered_map<std::string, std::string>> Utils::parseJsonArray(const std::string &json)
+{
+    std::vector<std::unordered_map<std::string, std::string>> result;
+    std::unordered_map<std::string, std::string> currentItem;
+    std::string key, value, line;
+
+    // Simulate a stream for line-by-line processing
+    std::istringstream stream(json);
+    bool isInQuotes = false;
+    char prevChar = '\0';
+
+    while (getline(stream, line, ','))
+    {
+        // Toggle isInQuotes based on unescaped quotes
+        for (char c : line)
+        {
+            if (c == '\"' && prevChar != '\\')
+            {
+                isInQuotes = !isInQuotes;
+            }
+            prevChar = c;
+        }
+
+        // Skip processing if we're inside quotes
+        if (isInQuotes)
+            continue;
+
+        line.erase(remove_if(line.begin(), line.end(), [](unsigned char x)
+                             { return isspace(x); }),
+                   line.end()); // Remove spaces
+
+        if (line.find('{') != std::string::npos)
+        {
+            // New object start, clear old data
+            currentItem.clear();
+        }
+        else if (line.find('}') != std::string::npos)
+        {
+            // Object end, save it to the result
+            if (!currentItem.empty())
+            {
+                result.push_back(currentItem);
+                currentItem.clear();
+            }
+        }
+        else
+        {
+            // Extracting key-value pairs
+            std::string::size_type pos = line.find(':');
+            if (pos != std::string::npos)
+            {
+                key = line.substr(0, pos);
+                value = line.substr(pos + 1);
+
+                // Removing quotes and brackets from key and value
+                key.erase(remove(key.begin(), key.end(), '\"'), key.end());
+                value.erase(remove(value.begin(), value.end(), '\"'), value.end());
+                value.erase(remove(value.begin(), value.end(), '['), value.end());
+                value.erase(remove(value.begin(), value.end(), ']'), value.end());
+
+                // Inserting into current map
+                currentItem[key] = value;
+            }
+        }
+    }
+
+    // Add the last item if it wasn't added already
+    if (!currentItem.empty())
+    {
+        result.push_back(currentItem);
+    }
+
+    return result;
+}

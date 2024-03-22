@@ -69,31 +69,36 @@ void Teapot::mainEventLoop(int client_socket)
                 body = Utils::readFileToBuffer(this->static_files_dir + "/index.html");
                 content_type = "text/html";
             }
-            else if (request.getUri().substr(request.getUri().length() - 3) == "css")
+            if (request.getUri() == "/all")
+            {
+                body = Utils::readFileToBuffer(this->static_files_dir + "/db.json");
+                content_type = "application/json";
+            }
+            if (request.getUri().length() >= 3 && request.getUri().substr(request.getUri().length() - 3) == "css")
             {
                 content_type = "text/css";
             }
-            else if (request.getUri().substr(request.getUri().length() - 3) == "ico")
+            else if (request.getUri().length() >= 3 && request.getUri().substr(request.getUri().length() - 3) == "ico")
             {
                 content_type = "image/x-icon";
             }
-            else if (request.getUri().substr(request.getUri().length() - 3) == "gif")
+            else if (request.getUri().length() >= 3 && request.getUri().substr(request.getUri().length() - 3) == "gif")
             {
                 content_type = "image/gif";
             }
-            else if (request.getUri().substr(request.getUri().length() - 3) == "jpg")
+            else if (request.getUri().length() >= 3 && request.getUri().substr(request.getUri().length() - 3) == "jpg")
             {
                 content_type = "image/jpeg";
             }
-            else if (request.getUri().substr(request.getUri().length() - 3) == "jpeg")
+            else if (request.getUri().length() >= 3 && request.getUri().substr(request.getUri().length() - 3) == "jpeg")
             {
                 content_type = "image/jpeg";
             }
-            else if (request.getUri().substr(request.getUri().length() - 3) == "png")
+            else if (request.getUri().length() >= 3 && request.getUri().substr(request.getUri().length() - 3) == "png")
             {
                 content_type = "image/png";
             }
-            else if (request.getUri().substr(request.getUri().length() - 2) == "js")
+            else if (request.getUri().length() >= 2 && request.getUri().substr(request.getUri().length() - 2) == "js")
             {
                 content_type = "text/javascript";
             }
@@ -139,7 +144,7 @@ void Teapot::mainEventLoop(int client_socket)
     }
     else if (request.getMethod() == "POST")
     {
-        db::JsonDatabase database = db::JsonDatabase("db.json");
+        db::JsonDatabase database = db::JsonDatabase(this->static_files_dir + "/db.json");
         auto data = parseFormData(request.getBody());
         Model model = extractAndStore(request.getBody());
 
