@@ -118,7 +118,7 @@ void UnixSocket::acceptConnection(int &client_socket, void *client_address)
     }
 }
 
-void UnixSocket::receive(int client_socket, char *buffer, unsigned int buffer_size)
+void UnixSocket::receiveData(int client_socket, char *buffer, unsigned int buffer_size)
 {
     if ((recv(client_socket, (void *)buffer, buffer_size, 0)) < 0)
     {
@@ -126,6 +126,11 @@ void UnixSocket::receive(int client_socket, char *buffer, unsigned int buffer_si
         std::cout << "Error code: " + errno << std::endl;
         exit(1);
     }
+}
+
+void UnixSocket::sendData(int client_socket, const void *buffer, unsigned int buffer_size, int flags)
+{
+    send(client_socket, buffer, buffer_size, flags);
 }
 
 void UnixSocket::closeSocket()
@@ -142,6 +147,11 @@ void UnixSocket::closeSocket()
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
+}
+
+void UnixSocket::closeSocket(int client_socket)
+{
+    close(client_socket);
 }
 
 UnixSocket::~UnixSocket() {}

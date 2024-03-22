@@ -29,7 +29,7 @@ Request Teapot::parseRequest(int client_socket)
     char buffer[BUFFER_SIZE];
     std::string raw_request;
 
-    this->socket.receive(client_socket, buffer, BUFFER_SIZE);
+    this->socket.receiveData(client_socket, buffer, BUFFER_SIZE);
 
     raw_request = std::string(buffer);
 
@@ -145,9 +145,8 @@ void Teapot::mainEventLoop(int client_socket)
 
     raw_response = response.getRawResponse();
 
-    send(client_socket, raw_response.c_str(), raw_response.length(), 0);
-
-    close(client_socket);
+    this->socket.sendData(client_socket, raw_response.c_str(), raw_response.length(), 0);
+    this->socket.closeSocket(client_socket);
 }
 
 Teapot::Teapot()
