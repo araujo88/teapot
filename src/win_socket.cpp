@@ -1,19 +1,27 @@
-#include "../include/unix_socket.hpp"
+#ifdef _WIN32
+#include "../include/win_socket.hpp"
 
 using namespace tpt;
 
-UnixSocket::UnixSocket()
+WinSocket::WinSocket()
 {
     this->ip_address = "127.0.0.1";
     this->port = 8000;
     this->max_connections = 10;
 
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+    {
+        std::printf("Failed. Error Code : %d", WSAGetLastError());
+        WSACleanup();
+        exit(EXIT_FAILURE);
+    }
+
     std::cout << "Creating socket ..." << std::endl;
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->server_socket < 0)
+    if (this->server_socket == INVALID_SOCKET)
     {
-        perror("Socket failed");
-        std::cout << "Error code: " + errno << std::endl;
+        std::printf("Could not create socket: %d\n", WSAGetLastError());
+        WSACleanup();
         exit(EXIT_FAILURE);
     }
 
@@ -22,18 +30,25 @@ UnixSocket::UnixSocket()
     this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
 }
 
-UnixSocket::UnixSocket(unsigned int port)
+WinSocket::WinSocket(unsigned int port)
 {
     this->ip_address = "127.0.0.1";
     this->port = port;
     this->max_connections = 10;
 
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+    {
+        std::printf("Failed. Error Code : %d", WSAGetLastError());
+        WSACleanup();
+        exit(EXIT_FAILURE);
+    }
+
     std::cout << "Creating socket ..." << std::endl;
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->server_socket < 0)
+    if (this->server_socket == INVALID_SOCKET)
     {
-        perror("Socket failed");
-        std::cout << "Error code: " + errno << std::endl;
+        std::printf("Could not create socket: %d\n", WSAGetLastError());
+        WSACleanup();
         exit(EXIT_FAILURE);
     }
 
@@ -42,18 +57,25 @@ UnixSocket::UnixSocket(unsigned int port)
     this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
 }
 
-UnixSocket::UnixSocket(std::string ip_address, unsigned int port)
+WinSocket::WinSocket(std::string ip_address, unsigned int port)
 {
     this->ip_address = ip_address;
     this->port = port;
     this->max_connections = 10;
 
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+    {
+        std::printf("Failed. Error Code : %d", WSAGetLastError());
+        WSACleanup();
+        exit(EXIT_FAILURE);
+    }
+
     std::cout << "Creating socket ..." << std::endl;
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->server_socket < 0)
+    if (this->server_socket == INVALID_SOCKET)
     {
-        perror("Socket failed");
-        std::cout << "Error code: " + errno << std::endl;
+        std::printf("Could not create socket: %d\n", WSAGetLastError());
+        WSACleanup();
         exit(EXIT_FAILURE);
     }
 
@@ -62,41 +84,47 @@ UnixSocket::UnixSocket(std::string ip_address, unsigned int port)
     this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
 }
 
-UnixSocket::UnixSocket(std::string ip_address, unsigned int port, unsigned int max_connections)
+WinSocket::WinSocket(std::string ip_address, unsigned int port, unsigned int max_connections)
 {
     this->ip_address = ip_address;
     this->port = port;
-    this->max_connections = max_connections;
+    this->max_connections = 10;
+
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+    {
+        std::printf("Failed. Error Code : %d", WSAGetLastError());
+        WSACleanup();
+        exit(EXIT_FAILURE);
+    }
 
     std::cout << "Creating socket ..." << std::endl;
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->server_socket < 0)
+    if (this->server_socket == INVALID_SOCKET)
     {
-        perror("Socket failed");
-        std::cout << "Error code: " + errno << std::endl;
+        std::printf("Could not create socket: %d\n", WSAGetLastError());
+        WSACleanup();
         exit(EXIT_FAILURE);
     }
-    std::cout << "Socket created!" << std::endl;
 
     this->server_address.sin_family = AF_INET;
     this->server_address.sin_port = htons(this->port);
     this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
 }
 
-void UnixSocket::bindSocket()
+void WinSocket::bindSocket()
 {
     std::cout << "Binding socket ..." << std::endl;
-    if ((bind(this->server_socket, (struct sockaddr *)&this->server_address, sizeof(this->server_address))) < 0)
+    if ((bind(this->server_socket, (struct sockaddr *)&this->server_address, sizeof(server_address))) == SOCKET_ERROR)
     {
-        perror("Bind failed");
-        std::cout << "Error code: " + errno << std::endl;
+        std::printf("Binding failed: %d\n", WSAGetLastError());
+        WSACleanup();
         exit(EXIT_FAILURE);
     }
     std::cout << "Binding done!" << std::endl;
     std::cout << "Listening to connections ..." << std::endl;
 }
 
-void UnixSocket::listenToConnections()
+void WinSocket::listenToConnections()
 {
     if ((listen(this->server_socket, this->max_connections)) < 0)
     {
@@ -106,8 +134,10 @@ void UnixSocket::listenToConnections()
     }
 }
 
-void UnixSocket::acceptConnection(int &client_socket, void *client_address)
+void WinSocket::acceptConnection(void *socket, void *client_address)
 {
+    SOCKET client_socket = *(SOCKET *)socket;
+
     socklen_t client_addr_size = sizeof(client_address);
     client_socket = accept(this->server_socket, (struct sockaddr *)&client_address, &client_addr_size);
     if (client_socket < 0)
@@ -118,8 +148,10 @@ void UnixSocket::acceptConnection(int &client_socket, void *client_address)
     }
 }
 
-ssize_t UnixSocket::receiveData(int client_socket, char *buffer, unsigned int buffer_size)
+int WinSocket::receiveData(void *socket, char *buffer, unsigned int buffer_size)
 {
+    SOCKET client_socket = *(SOCKET *)socket;
+
     ssize_t data = recv(client_socket, (void *)buffer, buffer_size, 0);
     if (data < 0)
     {
@@ -130,30 +162,28 @@ ssize_t UnixSocket::receiveData(int client_socket, char *buffer, unsigned int bu
     return data;
 }
 
-void UnixSocket::sendData(int client_socket, const void *buffer, unsigned int buffer_size, int flags)
+void WinSocket::sendData(void *socket, const void *buffer, unsigned int buffer_size, int flags)
 {
+    SOCKET client_socket = *(SOCKET *)socket;
+
     send(client_socket, buffer, buffer_size, flags);
 }
 
-void UnixSocket::closeSocket()
+void WinSocket::closeSocket()
 {
     std::cout << "Closing socket ..." << std::endl;
-    if (close(this->server_socket) == 0)
-    {
-        std::cout << "Socket closed!" << std::endl;
-        exit(EXIT_SUCCESS);
-    }
-    else
-    {
-        perror("An error occurred while closing the socket: ");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(EXIT_FAILURE);
-    }
+    closesocket(this->server_socket);
+    WSACleanup();
+    std::cout << "Socket closed!" << std::endl;
 }
 
-void UnixSocket::closeSocket(int client_socket)
+void WinSocket::closeSocket(void *socket)
 {
-    close(client_socket);
+    SOCKET client_socket = *(SOCKET *)socket;
+
+    closesocket(client_socket);
 }
 
-UnixSocket::~UnixSocket() {}
+WinSocket::~WinSocket() {}
+
+#endif
