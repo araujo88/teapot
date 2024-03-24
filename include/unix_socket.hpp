@@ -1,3 +1,4 @@
+#ifdef __linux__
 #ifndef UNIX_SOCKET_H_
 #define UNIX_SOCKET_H_
 
@@ -38,4 +39,5 @@ namespace tpt
     };
 }
 
+#endif
 #endif

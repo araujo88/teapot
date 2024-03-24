@@ -138,6 +138,9 @@ Teapot::Teapot()
     this->sanitizer_middleware = SanitizerMiddleware();
     this->cors_middleware = CORSMiddleware();
     this->security_middleware = SecurityMiddleware();
+#ifdef __linux__
+    this->socket = tpt::UnixSocket(this->port);
+#endif
 }
 
 Teapot::Teapot(unsigned int port)
@@ -147,7 +150,9 @@ Teapot::Teapot(unsigned int port)
     this->max_connections = 10;
     this->logging_type = DEFAULT;
     this->static_files_dir = "static";
-    this->socket = tpt::UnixSocket(port);
+#ifdef __linux__
+    this->socket = tpt::UnixSocket(this->port);
+#endif
 }
 
 Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir)
@@ -157,7 +162,9 @@ Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_conne
     this->max_connections = max_connections;
     this->logging_type = logging_type;
     this->static_files_dir = static_files_dir;
+#ifdef __linux__
     this->socket = tpt::UnixSocket(ip_address, port, max_connections);
+#endif
 }
 
 void Teapot::runServer()

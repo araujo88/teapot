@@ -29,7 +29,10 @@
 #include "response.hpp"
 #include "base_exceptions.hpp"
 #include "view.hpp"
+
+#ifdef __linux__
 #include "unix_socket.hpp"
+#endif
 
 #define BUFFER_SIZE 2048
 
@@ -58,7 +61,9 @@ namespace tpt
         CORSMiddleware cors_middleware;
         SanitizerMiddleware sanitizer_middleware;
         SecurityMiddleware security_middleware;
+#ifdef __linux__
         tpt::UnixSocket socket;
+#endif
 
         Request parseRequest(int client_socket);
         void mainEventLoop(int client_socket);
