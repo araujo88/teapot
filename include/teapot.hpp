@@ -65,7 +65,7 @@ namespace tpt
         tpt::UnixSocket socket;
 #endif
 
-        Request parseRequest(int client_socket);
+        std::optional<Request> parseRequest(int client_socket);
         void mainEventLoop(int client_socket);
 
     public:

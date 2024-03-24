@@ -118,14 +118,16 @@ void UnixSocket::acceptConnection(int &client_socket, void *client_address)
     }
 }
 
-void UnixSocket::receiveData(int client_socket, char *buffer, unsigned int buffer_size)
+int UnixSocket::receiveData(int client_socket, char *buffer, unsigned int buffer_size)
 {
-    if ((recv(client_socket, (void *)buffer, buffer_size, 0)) < 0)
+    ssize_t data = recv(client_socket, (void *)buffer, buffer_size, 0);
+    if (data < 0)
     {
         perror("Receive error");
         std::cout << "Error code: " + errno << std::endl;
         exit(1);
     }
+    return data;
 }
 
 void UnixSocket::sendData(int client_socket, const void *buffer, unsigned int buffer_size, int flags)
