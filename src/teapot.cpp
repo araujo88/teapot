@@ -3,33 +3,6 @@
 
 using namespace tpt;
 
-std::unordered_map<std::string, std::string> Teapot::parseFormData(const std::string &data) // application/x-www-form-urlencoded
-{
-    std::unordered_map<std::string, std::string> result;
-    size_t pos = 0;
-    while (pos < data.length())
-    {
-        size_t key_end = data.find('=', pos);
-        if (key_end == std::string::npos)
-        {
-            break;
-        }
-        std::string key = data.substr(pos, key_end - pos);
-        pos = key_end + 1;
-        size_t value_end = data.find('&', pos);
-        std::string value = value_end == std::string::npos ? data.substr(pos) : data.substr(pos, value_end - pos);
-        result[key] = value;
-        pos = value_end == std::string::npos ? data.length() : value_end + 1;
-    }
-    return result;
-}
-
-Model Teapot::extractAndStore(const std::string &requestBody)
-{
-    auto formData = this->parseFormData(requestBody);
-    return Model{formData["name"], formData["surname"]};
-}
-
 Request Teapot::parseRequest(int client_socket)
 {
     char buffer[BUFFER_SIZE];
@@ -69,11 +42,6 @@ void Teapot::mainEventLoop(int client_socket)
                 body = Utils::readFileToBuffer(this->static_files_dir + "/index.html");
                 content_type = "text/html";
             }
-            if (request.getUri() == "/all")
-            {
-                body = Utils::readFileToBuffer(this->static_files_dir + "/db.json");
-                content_type = "application/json";
-            }
             if (request.getUri().length() >= 3 && request.getUri().substr(request.getUri().length() - 3) == "css")
             {
                 content_type = "text/css";
@@ -102,7 +70,7 @@ void Teapot::mainEventLoop(int client_socket)
             {
                 content_type = "text/javascript";
             }
-            else
+            else if (request.getUri().length() >= 4 && request.getUri().substr(request.getUri().length() - 4) == "html")
             {
                 content_type = "text/html";
             }
@@ -141,22 +109,6 @@ void Teapot::mainEventLoop(int client_socket)
                 content_type = "text/html";
             }
         }
-    }
-    else if (request.getMethod() == "POST")
-    {
-        db::JsonDatabase database = db::JsonDatabase(this->static_files_dir + "/db.json");
-        auto data = parseFormData(request.getBody());
-        Model model = extractAndStore(request.getBody());
-
-        std::unordered_map<std::string, std::string> newEntry = {
-            {"id", std::to_string(model.getId())},
-            {"name", model.getName()},
-            {"surname", model.getSurname()}};
-
-        database.write(Utils::formatFormDataToJson(newEntry));
-        status_code = 201;
-        body = Utils::readFileToBuffer(this->static_files_dir + "/201.html");
-        content_type = "text/html";
     }
     else
     {

@@ -28,10 +28,8 @@
 #include "request.hpp"
 #include "response.hpp"
 #include "base_exceptions.hpp"
-#include "controller.hpp"
 #include "view.hpp"
 #include "unix_socket.hpp"
-#include "json_database.hpp"
 
 #define BUFFER_SIZE 2048
 
@@ -60,11 +58,9 @@ namespace tpt
         CORSMiddleware cors_middleware;
         SanitizerMiddleware sanitizer_middleware;
         SecurityMiddleware security_middleware;
-        std::list<Controller> controllers;
         tpt::UnixSocket socket;
 
         Request parseRequest(int client_socket);
-        std::unordered_map<std::string, std::string> parseFormData(const std::string &data);
         void mainEventLoop(int client_socket);
 
     public:
@@ -80,8 +76,6 @@ namespace tpt
         void addMiddleware(CORSMiddleware cors_middleware);
         void addMiddleware(SanitizerMiddleware sanitizer_middleware);
         void addMiddleware(SecurityMiddleware security_middleware);
-        void addController(Controller controller);
-        Model extractAndStore(const std::string &requestBody);
         ~Teapot();
     };
 }

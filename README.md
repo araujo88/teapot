@@ -1,6 +1,6 @@
 # teapot 🫖
 
-A simple and lightweight multi-threaded web framework in C++.
+A simple and lightweight multi-threaded web framework in C++ that serves static websites.
 
 ## Getting started
 
@@ -129,7 +129,4 @@ You can create your own custom middleware by inherting from the `Middleware` cla
 
 ## TODOs
 
-- Handle POST, PUT, HEAD requests
-- Integration with SQL databases
-- Implement Model-View-Controller (MVC) architecture
-- REST API router mode
+- Implement WinSocket
