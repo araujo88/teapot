@@ -2,22 +2,29 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v3
-    #- name: configure
-    #  run: ./configure
-    - name: make
-      run: make
-    #- name: make check
-    #  run: make check
-    #- name: make distcheck
-    #  run: make distcheck
+      - uses: actions/checkout@v3
+
+      - name: Build on Ubuntu
+        if: runner.os == 'Linux'
+        run: make
+
+      - name: Setup Build Environment on Windows
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build on Windows with MSBuild
+        if: runner.os == 'Windows'
+        run: |
+          msbuild teapot.sln /p:Configuration=Release /p:Platform="x64"
