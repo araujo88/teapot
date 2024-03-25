@@ -29,4 +29,4 @@ jobs:
       - name: Build on Windows with MSBuild
         if: runner.os == 'Windows'
         run: |
-          msbuild teapot.sln /p:Configuration=Release /p:Platform="x64" /p:CXXStandard=20
+          msbuild teapot.sln /p:Configuration=Release /p:Platform="x64" /p:CXXStandard=20 /p:LanguageStandard=C++20
