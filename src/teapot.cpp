@@ -200,12 +200,12 @@ void Teapot::runServer()
     {
         socket.listenToConnections();
 
-        int client_socket_fd;
+        SOCKET client_socket;
         void *client_addr = nullptr;
 
-        socket.acceptConnection(client_socket_fd, client_addr);
+        socket.acceptConnection(client_socket, client_addr);
 
-        std::jthread th(&Teapot::mainEventLoop, this, client_socket_fd);
+        std::jthread th(&Teapot::mainEventLoop, this, client_socket);
     }
 }
 

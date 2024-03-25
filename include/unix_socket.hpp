@@ -31,11 +31,11 @@ namespace tpt
         ~UnixSocket();
         virtual void bindSocket() override;
         virtual void listenToConnections() override;
-        virtual void acceptConnection(int &client_socket, void *client_address) override;
-        virtual ssize_t receiveData(int client_socket, char *buffer, unsigned int buffer_size) override;
-        virtual void sendData(int client_socket, const void *buffer, unsigned int buffer_size, int flags) override;
+        virtual void acceptConnection(SOCKET&client_socket, void *client_address) override;
+        virtual ssize_t receiveData(SOCKET client_socket, char *buffer, unsigned int buffer_size) override;
+        virtual void sendData(SOCKET client_socket, const void *buffer, unsigned int buffer_size, int flags) override;
         virtual void closeSocket() override;
-        virtual void closeSocket(int client_socket) override;
+        virtual void closeSocket(SOCKET client_socket) override;
     };
 }
 

@@ -107,7 +107,7 @@ void UnixSocket::listenToConnections()
     }
 }
 
-void UnixSocket::acceptConnection(int &client_socket, void *client_address)
+void UnixSocket::acceptConnection(SOCKET &client_socket, void *client_address)
 {
     socklen_t client_addr_size = sizeof(client_address);
     client_socket = accept(this->server_socket, (struct sockaddr *)&client_address, &client_addr_size);
@@ -119,7 +119,7 @@ void UnixSocket::acceptConnection(int &client_socket, void *client_address)
     }
 }
 
-ssize_t UnixSocket::receiveData(int client_socket, char *buffer, unsigned int buffer_size)
+ssize_t UnixSocket::receiveData(SOCKET client_socket, char *buffer, unsigned int buffer_size)
 {
     ssize_t data = recv(client_socket, (void *)buffer, buffer_size, 0);
     if (data < 0)
@@ -131,7 +131,7 @@ ssize_t UnixSocket::receiveData(int client_socket, char *buffer, unsigned int bu
     return data;
 }
 
-void UnixSocket::sendData(int client_socket, const void *buffer, unsigned int buffer_size, int flags)
+void UnixSocket::sendData(SOCKET client_socket, const void *buffer, unsigned int buffer_size, int flags)
 {
     send(client_socket, buffer, buffer_size, flags);
 }
@@ -158,7 +158,7 @@ void UnixSocket::closeSocket()
     }
 }
 
-void UnixSocket::closeSocket(int client_socket)
+void UnixSocket::closeSocket(SOCKET client_socket)
 {
     close(client_socket);
 }
