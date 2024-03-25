@@ -71,6 +71,8 @@ void Teapot::requestHandler(SOCKET client_socket)
     auto request = parseRequest(client_socket);
     std::string body;
     std::string content_type;
+    std::string method;
+    std::string uri;
     unsigned int status_code = 500; // Default to internal server error in case of early failure
 
     try
@@ -79,13 +81,11 @@ void Teapot::requestHandler(SOCKET client_socket)
         {
             context->request = &(*request);
             this->sanitizer_middleware.handle(context.get());
-            std::string uri = request->getUri();
+            uri = request->getUri();
             if (uri == "/")
                 uri = "/index.html"; // Normalize root access to a specific file, e.g., index.html
-            std::string method = request->getMethod();
+            method = request->getMethod();
             content_type = determineContentType(uri); // Determine content type early based on URI
-
-            std::cout << "[" << request->getDate() << "] " << this->socket.getClientIp() + " " << method << " " << uri << " HTTP/1.1 ";
 
             if (method == "GET")
             {
@@ -151,7 +151,7 @@ void Teapot::requestHandler(SOCKET client_socket)
     this->cors_middleware.handle(context.get());
     this->security_middleware.handle(context.get());
 
-    std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << "\n";
+    LOG_INFO(logger, this->socket.getClientIp() + " " + method + " " + uri + " HTTP/1.1 " + response.getStatusCode() + " " + response.getStatusCodeDescription());
 
     std::string raw_response = response.getRawResponse();
     this->socket.sendData(client_socket, raw_response.c_str(), raw_response.length(), 0);
