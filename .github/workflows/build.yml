@@ -24,16 +24,7 @@ jobs:
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Set C++ Standard to C++20 in Project Files
-        if: runner.os == 'Windows'
-        run: |
-          $content = Get-Content teapot.vcxproj -Raw
-          $content = $content -replace '<LanguageStandard>stdcpplatest</LanguageStandard>', '<LanguageStandard>stdcpp20</LanguageStandard>'
-          Set-Content teapot.vcxproj -Value $content
-        shell: pwsh
-
       - name: Build on Windows with MSBuild
         if: runner.os == 'Windows'
         run: |
-          msbuild teapot.sln /p:Configuration=Release /p:Platform="x64"
-
+          msbuild teapot.sln /p:Configuration=Release /p:Platform="x64" /p:CXXStandard=20
