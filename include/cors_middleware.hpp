@@ -25,8 +25,7 @@ namespace tpt
                        unsigned int max_age,
                        bool allow_credentials);
         ~CORSMiddleware();
-        virtual void requestHandler(Request *request) override;
-        virtual void responseHandler(Response *response) override;
+        virtual void handle(Context *context) override;
     };
 }
 

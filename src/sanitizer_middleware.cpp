@@ -6,16 +6,12 @@ SanitizerMiddleware::SanitizerMiddleware()
 {
 }
 
-void SanitizerMiddleware::requestHandler(Request *request)
+void SanitizerMiddleware::handle(Context *context)
 {
-    std::string body = request->getBody();
+    std::string body = context->request->getBody();
     body = Utils::replaceString(body, "<", "&lt;");
     body = Utils::replaceString(body, ">", "&gt;");
-    request->setBody(body);
-}
-
-void SanitizerMiddleware::responseHandler(Response *response)
-{
+    context->request->setBody(body);
 }
 
 SanitizerMiddleware::~SanitizerMiddleware()

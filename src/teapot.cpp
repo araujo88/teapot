@@ -23,6 +23,7 @@ std::optional<Request> Teapot::parseRequest(int client_socket)
 
 void Teapot::mainEventLoop(int client_socket)
 {
+    Context *context = new Context(nullptr, nullptr);
     std::optional<Request> request = parseRequest(client_socket);
 
     if (request)
@@ -32,12 +33,14 @@ void Teapot::mainEventLoop(int client_socket)
         std::string content_type;
         unsigned int status_code;
 
+        context->request = &request.value();
+
         std::cout << "[" + request->getDate() + "]" + " " + request->getMethod() + " " + request->getUri() + " HTTP/1.1 ";
 
         if (request->getMethod() == "POST" || request->getMethod() == "PUT")
         {
             std::cout << "Content-type: " + request->getHeader("Content-Type") << std::endl;
-            this->sanitizer_middleware.requestHandler(&request.value());
+            this->sanitizer_middleware.handle(context);
             std::cout << request->getBody() << std::endl;
         }
 
@@ -128,14 +131,17 @@ void Teapot::mainEventLoop(int client_socket)
         Response response = Response(body, content_type, status_code);
         std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << std::endl;
 
-        this->cors_middleware.responseHandler(&response);
-        this->security_middleware.responseHandler(&response);
+        context->response = &response;
+
+        this->cors_middleware.handle(context);
+        this->security_middleware.handle(context);
 
         raw_response = response.getRawResponse();
 
         this->socket.sendData(client_socket, raw_response.c_str(), raw_response.length(), 0);
     }
     this->socket.closeSocket(client_socket);
+    delete context;
 }
 
 Teapot::Teapot()

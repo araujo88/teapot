@@ -12,8 +12,7 @@ namespace tpt
     public:
         SanitizerMiddleware();
         ~SanitizerMiddleware();
-        virtual void requestHandler(Request *request) override;
-        virtual void responseHandler(Response *response) override;
+        virtual void handle(Context *context) override;
     };
 }
 

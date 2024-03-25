@@ -27,18 +27,14 @@ SecurityMiddleware::SecurityMiddleware(std::string cross_origin_opener_policy,
     this->x_xss_protection = x_xss_protection;
 }
 
-void SecurityMiddleware::requestHandler(Request *request)
+void SecurityMiddleware::handle(Context *context)
 {
-}
-
-void SecurityMiddleware::responseHandler(Response *response)
-{
-    response->addHeader("Cross-Origin-Opener-Policy: " + this->cross_origin_opener_policy);
-    response->addHeader("Referrer-Policy: " + this->referrer_policy);
-    response->addHeader("Strict-Transport-Security: " + this->strict_transport_security);
-    response->addHeader("X-Content-Type-Options: " + this->x_content_type_options);
-    response->addHeader("X-Frame-Options: " + this->x_frame_options);
-    response->addHeader("X-XSS-Protection: " + this->x_xss_protection);
+    context->response->addHeader("Cross-Origin-Opener-Policy: " + this->cross_origin_opener_policy);
+    context->response->addHeader("Referrer-Policy: " + this->referrer_policy);
+    context->response->addHeader("Strict-Transport-Security: " + this->strict_transport_security);
+    context->response->addHeader("X-Content-Type-Options: " + this->x_content_type_options);
+    context->response->addHeader("X-Frame-Options: " + this->x_frame_options);
+    context->response->addHeader("X-XSS-Protection: " + this->x_xss_protection);
 }
 
 SecurityMiddleware::~SecurityMiddleware()

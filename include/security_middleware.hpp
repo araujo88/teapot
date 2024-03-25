@@ -23,8 +23,7 @@ namespace tpt
                            std::string x_content_type_options,
                            std::string x_frame_options,
                            std::string x_xss_protection);
-        virtual void requestHandler(Request *request) override;
-        virtual void responseHandler(Response *response) override;
+        virtual void handle(Context *context) override;
         ~SecurityMiddleware();
     };
 }

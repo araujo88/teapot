@@ -24,17 +24,13 @@ CORSMiddleware::CORSMiddleware(std::string allow_origins,
     this->allow_credentials = allow_credentials;
 }
 
-void CORSMiddleware::requestHandler(Request *request)
+void CORSMiddleware::handle(Context *context)
 {
-}
-
-void CORSMiddleware::responseHandler(Response *response)
-{
-    response->addHeader("Access-Control-Allow-Origin: " + this->allow_origins);
-    response->addHeader("Access-Control-Allow-Methods: " + this->allow_methods);
-    response->addHeader("Access-Control-Allow-Headers: " + this->allow_headers);
-    response->addHeader("Access-Control-Max-Age: " + std::to_string(this->max_age));
-    response->addHeader("Access-Control-Allow-Credentials: " + Utils::btos(this->allow_credentials));
+    context->response->addHeader("Access-Control-Allow-Origin: " + this->allow_origins);
+    context->response->addHeader("Access-Control-Allow-Methods: " + this->allow_methods);
+    context->response->addHeader("Access-Control-Allow-Headers: " + this->allow_headers);
+    context->response->addHeader("Access-Control-Max-Age: " + std::to_string(this->max_age));
+    context->response->addHeader("Access-Control-Allow-Credentials: " + Utils::btos(this->allow_credentials));
 }
 
 CORSMiddleware::~CORSMiddleware()

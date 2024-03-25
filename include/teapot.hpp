@@ -27,6 +27,7 @@
 #include "utils.hpp"
 #include "request.hpp"
 #include "response.hpp"
+#include "context.hpp"
 #include "base_exceptions.hpp"
 
 #ifdef __linux__
