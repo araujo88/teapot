@@ -43,132 +43,112 @@ std::optional<Request> Teapot::parseRequest(int client_socket)
     return Request(std::string(request_view)); // Convert to std::string only when necessary, for example, to construct a Request object
 }
 
-void Teapot::mainEventLoop(int client_socket)
+std::string Teapot::determineContentType(const std::string &uri)
 {
-    Context *context = new Context(nullptr, nullptr);
-    std::optional<Request> request = parseRequest(client_socket);
+    // This function returns the content type based on the file extension
+    // It's a simplified version; you might want to refine this based on your requirements
+    if (uri.ends_with(".css"))
+        return "text/css";
+    if (uri.ends_with(".ico"))
+        return "image/x-icon";
+    if (uri.ends_with(".gif"))
+        return "image/gif";
+    if (uri.ends_with(".jpg") || uri.ends_with(".jpeg"))
+        return "image/jpeg";
+    if (uri.ends_with(".png"))
+        return "image/png";
+    if (uri.ends_with(".js"))
+        return "text/javascript";
+    if (uri.ends_with(".html"))
+        return "text/html";
+    // Default content type for unknown types
+    return "text/plain";
+}
+
+void Teapot::mainEventLoop(SOCKET client_socket)
+{
+    auto context = std::make_unique<Context>(nullptr, nullptr);
+    auto request = parseRequest(client_socket);
+    std::string body;
+    std::string content_type;
+    unsigned int status_code = 500; // Default to internal server error in case of early failure
 
     if (request)
     {
-        std::string raw_response;
-        std::string body;
-        std::string content_type;
-        unsigned int status_code;
+        context->request = &(*request);
+        this->sanitizer_middleware.handle(context.get());
+        std::string uri = request->getUri();
+        if (uri == "/")
+            uri = "/index.html"; // Normalize root access to a specific file, e.g., index.html
+        std::string method = request->getMethod();
+        content_type = determineContentType(uri); // Determine content type early based on URI
 
-        context->request = &request.value();
+        std::cout << "[" << request->getDate() << "] " << method << " " << uri << " HTTP/1.1 ";
 
-        std::cout << "[" + request->getDate() + "]" + " " + request->getMethod() + " " + request->getUri() + " HTTP/1.1 ";
-
-        if (request->getMethod() == "POST" || request->getMethod() == "PUT")
+        if (method == "GET")
         {
-            std::cout << "Content-type: " + request->getHeader("Content-Type") << std::endl;
-            this->sanitizer_middleware.handle(context);
-            std::cout << request->getBody() << std::endl;
-        }
+            // Check for predefined routes or responses before attempting to read a file
+            auto routeIt = this->routes.find(uri);
+            auto jsonIt = this->json_responses.find(uri);
+            auto htmlIt = this->html_responses.find(uri);
 
-        if (request->getMethod() == "GET")
-        {
-            std::string uri = request->getUri();
-            if (uri == "/")
+            if (routeIt != this->routes.end())
             {
-                uri = "/index.html";
-            }
-            try
-            {
-                body = Utils::readFileToBuffer(this->static_files_dir + uri);
-                if (uri == "/")
-                {
-                    body = Utils::readFileToBuffer(this->static_files_dir + "/index.html");
-                    content_type = "text/html";
-                }
-                if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "css")
-                {
-                    content_type = "text/css";
-                }
-                else if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "ico")
-                {
-                    content_type = "image/x-icon";
-                }
-                else if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "gif")
-                {
-                    content_type = "image/gif";
-                }
-                else if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "jpg")
-                {
-                    content_type = "image/jpeg";
-                }
-                else if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "jpeg")
-                {
-                    content_type = "image/jpeg";
-                }
-                else if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "png")
-                {
-                    content_type = "image/png";
-                }
-                else if (uri.length() >= 2 && uri.substr(uri.length() - 2) == "js")
-                {
-                    content_type = "text/javascript";
-                }
-                else if (uri.length() >= 4 && uri.substr(uri.length() - 4) == "html")
-                {
-                    content_type = "text/html";
-                }
+                body = Utils::readFileToBuffer(this->static_files_dir + routeIt->second);
                 status_code = 200;
             }
-            catch (FileNotFoundException &e)
+            else if (jsonIt != this->json_responses.end())
             {
-                body = Utils::readFileToBuffer(this->static_files_dir + "/404.html");
+                body = jsonIt->second;
+                status_code = 200;
+                content_type = "application/json";
+            }
+            else if (htmlIt != this->html_responses.end())
+            {
+                body = htmlIt->second;
+                status_code = 200;
                 content_type = "text/html";
-                status_code = 404;
             }
-            for (auto const &[url, file_path] : this->routes)
+            else
             {
-                if (uri == url)
+                try
                 {
-                    body = Utils::readFileToBuffer(this->static_files_dir + file_path);
+                    body = Utils::readFileToBuffer(this->static_files_dir + uri);
                     status_code = 200;
-                    content_type = "text/html";
                 }
-            }
-            for (auto const &[url, json] : this->json_responses)
-            {
-                if (uri == url)
+                catch (FileNotFoundException &)
                 {
-                    body = json;
-                    status_code = 200;
-                    content_type = "application/json";
-                }
-            }
-            for (auto const &[url, html] : this->html_responses)
-            {
-                if (uri == url)
-                {
-                    body = html;
-                    status_code = 200;
+                    body = Utils::readFileToBuffer(this->static_files_dir + "/404.html");
                     content_type = "text/html";
+                    status_code = 404;
                 }
             }
         }
         else
         {
-            status_code = 500;
-            body = Utils::readFileToBuffer(this->static_files_dir + "/500.html");
+            // If not GET, assume method not supported
+            body = Utils::readFileToBuffer(this->static_files_dir + "/405.html");
             content_type = "text/html";
+            status_code = 405;
         }
-        Response response = Response(body, content_type, status_code);
-        std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << std::endl;
-
-        context->response = &response;
-
-        this->cors_middleware.handle(context);
-        this->security_middleware.handle(context);
-
-        raw_response = response.getRawResponse();
-
-        this->socket.sendData(client_socket, raw_response.c_str(), raw_response.length(), 0);
     }
+    else
+    {
+        // Handle parsing failure by responding with 500 Internal Server Error
+        body = Utils::readFileToBuffer(this->static_files_dir + "/500.html");
+        content_type = "text/html";
+    }
+    Response response(body, content_type, status_code);
+    context->response = &response;
+    this->cors_middleware.handle(context.get());
+    this->security_middleware.handle(context.get());
+
+    std::cout << response.getStatusCode() + " " + response.getStatusCodeDescription() << "\n";
+
+    std::string raw_response = response.getRawResponse();
+    this->socket.sendData(client_socket, raw_response.c_str(), raw_response.length(), 0);
+
     this->socket.closeSocket(client_socket);
-    delete context;
 }
 
 Teapot::Teapot()

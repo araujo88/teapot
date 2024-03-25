@@ -39,7 +39,7 @@ namespace tpt
     class Teapot
     {
     private:
-        typedef enum _logging
+        typedef enum
         {
             DEFAULT,
             NORMAL,
@@ -65,7 +65,8 @@ namespace tpt
 #endif
 
         std::optional<Request> parseRequest(int client_socket);
-        void mainEventLoop(int client_socket);
+        std::string determineContentType(const std::string &uri);
+        void mainEventLoop(SOCKET client_socket);
 
     public:
         Teapot();
