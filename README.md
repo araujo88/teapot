@@ -1,7 +1,7 @@
 # teapot 🫖
 
 [![license](https://img.shields.io/badge/license-GPL-green)](https://raw.githubusercontent.com/araujo88/teapot/main/LICENSE)
-[![build](https://github.com/araujo88/teapot/actions/workflows/c-cpp.yaml/badge.svg?branch=main)](https://github.com/araujo88/teapot/actions/workflows/c-cpp.yaml)
+[![build](https://github.com/araujo88/teapot/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/araujo88/teapot/actions/workflows/build.yml)
 
 A simple and lightweight multi-threaded web framework in C++ that serves static websites.
 
