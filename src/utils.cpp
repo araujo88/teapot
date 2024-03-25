@@ -4,16 +4,20 @@ using namespace tpt;
 
 std::string Utils::readFileToBuffer(std::string filename)
 {
-    std::ifstream file;
-    file.open(filename); // open the input file
+    // Use std::filesystem to handle paths correctly across different OSes
+    std::filesystem::path filePath{ filename };
+
+    std::ifstream file(filePath); // Open the input file using the filesystem path
 
     if (!file)
     {
+        // Optionally, print the absolute path for debugging purposes
+        std::cerr << "Failed to open file: " << filePath << std::endl;
         throw FileNotFoundException();
     }
 
     std::stringstream strStream;
-    strStream << file.rdbuf(); // read the file
+    strStream << file.rdbuf(); // Read the file
     return strStream.str();    // str holds the content of the file
 }
 

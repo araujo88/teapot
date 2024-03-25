@@ -9,6 +9,7 @@
 #include <stack>
 #include <unordered_map>
 #include <vector>
+#include <filesystem>
 #include "base_exceptions.hpp"
 
 namespace tpt

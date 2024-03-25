@@ -46,43 +46,48 @@ void Teapot::mainEventLoop(int client_socket)
 
         if (request->getMethod() == "GET")
         {
+            std::string uri = request->getUri();
+            if (uri == "/")
+            {
+                uri = "/index.html"; // Rewrite root access to /index.html
+            }
             try
             {
-                body = Utils::readFileToBuffer(this->static_files_dir + request->getUri());
-                if (request->getUri() == "/")
+                body = Utils::readFileToBuffer(this->static_files_dir + uri);
+                if (uri == "/")
                 {
                     body = Utils::readFileToBuffer(this->static_files_dir + "/index.html");
                     content_type = "text/html";
                 }
-                if (request->getUri().length() >= 3 && request->getUri().substr(request->getUri().length() - 3) == "css")
+                if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "css")
                 {
                     content_type = "text/css";
                 }
-                else if (request->getUri().length() >= 3 && request->getUri().substr(request->getUri().length() - 3) == "ico")
+                else if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "ico")
                 {
                     content_type = "image/x-icon";
                 }
-                else if (request->getUri().length() >= 3 && request->getUri().substr(request->getUri().length() - 3) == "gif")
+                else if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "gif")
                 {
                     content_type = "image/gif";
                 }
-                else if (request->getUri().length() >= 3 && request->getUri().substr(request->getUri().length() - 3) == "jpg")
+                else if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "jpg")
                 {
                     content_type = "image/jpeg";
                 }
-                else if (request->getUri().length() >= 3 && request->getUri().substr(request->getUri().length() - 3) == "jpeg")
+                else if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "jpeg")
                 {
                     content_type = "image/jpeg";
                 }
-                else if (request->getUri().length() >= 3 && request->getUri().substr(request->getUri().length() - 3) == "png")
+                else if (uri.length() >= 3 && uri.substr(uri.length() - 3) == "png")
                 {
                     content_type = "image/png";
                 }
-                else if (request->getUri().length() >= 2 && request->getUri().substr(request->getUri().length() - 2) == "js")
+                else if (uri.length() >= 2 && uri.substr(uri.length() - 2) == "js")
                 {
                     content_type = "text/javascript";
                 }
-                else if (request->getUri().length() >= 4 && request->getUri().substr(request->getUri().length() - 4) == "html")
+                else if (uri.length() >= 4 && uri.substr(uri.length() - 4) == "html")
                 {
                     content_type = "text/html";
                 }
@@ -96,7 +101,7 @@ void Teapot::mainEventLoop(int client_socket)
             }
             for (auto const &[url, file_path] : this->routes)
             {
-                if (request->getUri() == url)
+                if (uri == url)
                 {
                     body = Utils::readFileToBuffer(this->static_files_dir + file_path);
                     status_code = 200;
@@ -105,7 +110,7 @@ void Teapot::mainEventLoop(int client_socket)
             }
             for (auto const &[url, json] : this->json_responses)
             {
-                if (request->getUri() == url)
+                if (uri == url)
                 {
                     body = json;
                     status_code = 200;
@@ -114,7 +119,7 @@ void Teapot::mainEventLoop(int client_socket)
             }
             for (auto const &[url, html] : this->html_responses)
             {
-                if (request->getUri() == url)
+                if (uri == url)
                 {
                     body = html;
                     status_code = 200;
