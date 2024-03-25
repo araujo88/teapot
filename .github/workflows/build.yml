@@ -12,13 +12,17 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v3
-
       - name: Build on Ubuntu
         if: runner.os == 'Linux'
         run: make
+      - name: Upload teapot binary
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v2
+        with:
+          name: teapot-binary
+          path: ./teapot
 
       # - name: Setup Build Environment on Windows
       #   if: runner.os == 'Windows'
@@ -36,8 +40,15 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v3
+      - name: Download teapot binary
+        uses: actions/download-artifact@v2
+        with:
+          name: teapot-binary
+          path: .
+      - name: Set execute permissions on teapot
+        run: chmod +x ./teapot
       - name: Run endpoint tests
         run: |
-          ./teapot 8888 &  # Start server in background
-          sleep 5             # Simple wait (improve this for reliable server readiness check)
+          ./teapot 8888 &
+          sleep 5
           ./tests/e2e_tests.sh
