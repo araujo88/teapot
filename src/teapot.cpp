@@ -6,19 +6,41 @@ using namespace tpt;
 std::optional<Request> Teapot::parseRequest(int client_socket)
 {
     char buffer[BUFFER_SIZE] = {0};
-    std::string raw_request;
+    ssize_t total_bytes_received = 0;
+    ssize_t bytes_received;
+    bool request_end_found = false;
 
-    ssize_t bytes_received = this->socket.receiveData(client_socket, buffer, BUFFER_SIZE);
-    if (bytes_received > 0)
+    // Use a loop to handle partial reads
+    while ((bytes_received = this->socket.receiveData(client_socket, buffer + total_bytes_received, BUFFER_SIZE - total_bytes_received - 1)) > 0)
     {
-        raw_request = std::string(buffer);
-        std::cout << raw_request << std::endl;
-        return Request(raw_request);
+        total_bytes_received += bytes_received;
+
+        // Check if the end of the request (\r\n\r\n) has been reached
+        if (std::string_view(buffer, total_bytes_received).find("\r\n\r\n") != std::string_view::npos)
+        {
+            request_end_found = true;
+            break;
+        }
+
+        // Ensure buffer isn't overflowed; leave room for null terminator
+        if (total_bytes_received >= BUFFER_SIZE - 1)
+            break;
     }
-    else
+
+    // If no data received or request end not found, return nullopt
+    if (total_bytes_received <= 0 || !request_end_found)
     {
         return std::nullopt;
     }
+
+    // Null-terminate the received data
+    buffer[total_bytes_received] = '\0';
+
+    // Now, buffer contains the raw request as a C-string. Use std::string_view for further processing to avoid copies
+    std::string_view request_view(buffer, total_bytes_received);
+    // Example: Extract the request line or headers using std::string_view operations...
+
+    return Request(std::string(request_view)); // Convert to std::string only when necessary, for example, to construct a Request object
 }
 
 void Teapot::mainEventLoop(int client_socket)
@@ -49,7 +71,7 @@ void Teapot::mainEventLoop(int client_socket)
             std::string uri = request->getUri();
             if (uri == "/")
             {
-                uri = "/index.html"; // Rewrite root access to /index.html
+                uri = "/index.html";
             }
             try
             {
