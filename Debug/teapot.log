@@ -1,9 +1,0 @@
-﻿  utils.cpp
-C:\Users\leona\Github\teapot\src\utils.cpp(25,24): warning C4996: 'ctime': This function or variable may be unsafe. Consider using ctime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  win_socket.cpp
-C:\Users\leona\Github\teapot\src\win_socket.cpp(30,44): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-C:\Users\leona\Github\teapot\src\win_socket.cpp(57,44): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-C:\Users\leona\Github\teapot\src\win_socket.cpp(84,44): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-C:\Users\leona\Github\teapot\src\win_socket.cpp(111,44): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-  Generating Code...
-  teapot.vcxproj -> C:\Users\leona\Github\teapot\Debug\teapot.exe

@@ -126,11 +126,12 @@ void WinSocket::bindSocket()
 
 void WinSocket::listenToConnections()
 {
-    if ((listen(this->server_socket, this->max_connections)) < 0)
+    if ((listen(this->server_socket, this->max_connections)) == SOCKET_ERROR)
     {
-        perror("Listen failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(1);
+        std::printf("Listening failed: %d\n", WSAGetLastError());
+        closesocket(this->server_socket);
+        WSACleanup();
+        exit(EXIT_FAILURE);
     }
 }
 
