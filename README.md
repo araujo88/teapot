@@ -130,6 +130,3 @@ For CORS middleware, the parameters are: `CORSMiddleware(allow_origins, allow_me
 
 You can create your own custom middleware by inherting from the `Middleware` class which already contains the request and response handlers methods.
 
-## TODOs
-
-- Implement WinSocket
