@@ -32,9 +32,12 @@ jobs:
       #     msbuild teapot.sln /p:Configuration=Release /p:Platform="x64" /p:CXXStandard=20 /p:LanguageStandard=C++20
 
   test:
-    runs-on: ubuntu-latest # Or another suitable OS
-    needs: build # Run the test after the build job
+    runs-on: ubuntu-latest
+    needs: build
     steps:
       - uses: actions/checkout@v3
       - name: Run endpoint tests
-        run: bash ./teapot 8888 && ./tests/e2e_tests.sh
+        run: |
+          ./teapot 8888 &  # Start server in background
+          sleep 5             # Simple wait (improve this for reliable server readiness check)
+          ./tests/e2e_tests.sh
