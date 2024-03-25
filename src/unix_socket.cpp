@@ -138,6 +138,12 @@ void UnixSocket::sendData(int client_socket, const void *buffer, unsigned int bu
 void UnixSocket::closeSocket()
 {
     std::cout << "Closing socket ..." << std::endl;
+    if (shutdown(this->server_socket, SHUT_RDWR) == -1)
+    {
+        perror("An error occurred while shutting down the socket: ");
+        std::cout << "Error code: " + errno << std::endl;
+        exit(EXIT_FAILURE);
+    }
     if (close(this->server_socket) == 0)
     {
         std::cout << "Socket closed!" << std::endl;
