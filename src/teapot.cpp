@@ -83,7 +83,7 @@ void Teapot::mainEventLoop(SOCKET client_socket)
         std::string method = request->getMethod();
         content_type = determineContentType(uri); // Determine content type early based on URI
 
-        std::cout << "[" << request->getDate() << "] " << method << " " << uri << " HTTP/1.1 ";
+        std::cout << "[" << request->getDate() << "] " << this->socket.getClientIp() + " " << method << " " << uri << " HTTP/1.1 ";
 
         if (method == "GET")
         {

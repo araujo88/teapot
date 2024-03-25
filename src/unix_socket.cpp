@@ -109,14 +109,38 @@ void UnixSocket::listenToConnections()
 
 void UnixSocket::acceptConnection(SOCKET &client_socket, void *client_address)
 {
-    socklen_t client_addr_size = sizeof(client_address);
-    client_socket = accept(this->server_socket, (struct sockaddr *)&client_address, &client_addr_size);
+    struct sockaddr_storage client_addr_storage;
+    socklen_t client_addr_size = sizeof(client_addr_storage);
+
+    client_socket = accept(this->server_socket, (struct sockaddr *)&client_addr_storage, &client_addr_size);
     if (client_socket < 0)
     {
         perror("Accept failed");
-        std::cout << "Error code: " + std::to_string(errno) << std::endl;
+        std::cout << "Error code: " << std::to_string(errno) << std::endl;
         exit(EXIT_FAILURE);
     }
+
+    // Assuming client_address is meant to store the result
+    if (client_address != nullptr)
+    {
+        std::memcpy(client_address, &client_addr_storage, client_addr_size);
+    }
+
+    char ip_str[INET6_ADDRSTRLEN] = {0}; // Large enough for both IPv4 and IPv6
+    if (client_addr_storage.ss_family == AF_INET)
+    {
+        // IPv4
+        struct sockaddr_in *addr_in = (struct sockaddr_in *)&client_addr_storage;
+        inet_ntop(AF_INET, &addr_in->sin_addr, ip_str, INET_ADDRSTRLEN);
+    }
+    else if (client_addr_storage.ss_family == AF_INET6)
+    {
+        // IPv6
+        struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *)&client_addr_storage;
+        inet_ntop(AF_INET6, &addr_in6->sin6_addr, ip_str, INET6_ADDRSTRLEN);
+    }
+
+    this->client_ip = std::string(ip_str);
 }
 
 ssize_t UnixSocket::receiveData(SOCKET client_socket, char *buffer, unsigned int buffer_size)
@@ -161,6 +185,11 @@ void UnixSocket::closeSocket()
 void UnixSocket::closeSocket(SOCKET client_socket)
 {
     close(client_socket);
+}
+
+std::string UnixSocket::getClientIp()
+{
+    return this->client_ip;
 }
 
 UnixSocket::~UnixSocket() {}

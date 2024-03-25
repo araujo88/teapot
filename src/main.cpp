@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
         std::cout << "Fatal error - please provide a port number!" << std::endl;
         return EXIT_FAILURE;
     }
+
     tpt::Teapot server = tpt::Teapot(atoi(argv[1]));
     tpt::CORSMiddleware cors_middleware = tpt::CORSMiddleware("*", "*", "*", 86400, true);
     tpt::SecurityMiddleware security_middleware;

@@ -5,7 +5,7 @@ using namespace tpt;
 std::string Utils::readFileToBuffer(std::string filename)
 {
     // Use std::filesystem to handle paths correctly across different OSes
-    std::filesystem::path filePath{ filename };
+    std::filesystem::path filePath{filename};
 
     std::ifstream file(filePath); // Open the input file using the filesystem path
 
