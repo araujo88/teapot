@@ -16,6 +16,6 @@ int main(int argc, char *argv[])
     server.addMiddleware(security_middleware);
     server.returnJSON("/test", "{\"name\": \"john\", \"surname\": \"doe\"}");
     server.returnHTML("/example", "<html><h1>Example</h1></html>");
-    server.runServer();
+    server.run();
     return 0;
 }

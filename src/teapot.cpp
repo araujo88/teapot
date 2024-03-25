@@ -199,7 +199,7 @@ Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_conne
 #endif
 }
 
-void Teapot::runServer()
+void Teapot::run()
 {
     socket.bindSocket();
 

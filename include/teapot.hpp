@@ -72,7 +72,7 @@ namespace tpt
         Teapot();
         Teapot(unsigned int port);
         Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir);
-        void runServer();
+        void run();
         void serveFile(std::string url, std::string file_path);
         void returnHTML(std::string url, std::string html);
         void returnHTML(std::string url, std::string html, unsigned int status_code);

@@ -34,7 +34,7 @@ In `main.cpp` file:
 int main(int argc, char *argv[])
 {
     tpt::Teapot server;
-    server.runServer();
+    server.run();
     return 0;
 }
 ```
@@ -49,7 +49,7 @@ To run in a different port:
 int main(int argc, char *argv[])
 {
     tpt::Teapot server = tpt::Teapot(atoi(argv[1]));
-    server.runServer();
+    server.run();
     return 0;
 }
 
@@ -65,7 +65,7 @@ Optionally, the following arguments can be provided for the server instance:
 int main(int argc, char *argv[])
 {
     tpt::Teapot server = tpt::Teapot(ip_address, port, max_connections, logging_type, static_files_dir);
-    server.runServer();
+    server.run();
     return 0;
 }
 
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 {
     tpt::Teapot server;
     server.serveFile("/example", "/example.html");
-    server.runServer();
+    server.run();
     return 0;
 }
 ```
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 {
     tpt::Teapot server;
     server.returnJSON("/test", "{\"name\": \"john\", \"surname\": \"doe\"}");
-    server.runServer();
+    server.run();
     return 0;
 }
 ```
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 {
     tpt::Teapot server;
     server.returnHTML("/example", "<html><h1>Example</h1></html>");
-    server.runServer();
+    server.run();
     return 0;
 }
 ```
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
     tpt::Teapot server;
     tpt::CORSMiddleware cors_middleware = tpt::CORSMiddleware("*", "*", "*", 86400, true);
     server.addMiddleware(cors_middleware);
-    server.runServer();
+    server.run();
     return 0;
 }
 ```
@@ -142,4 +142,3 @@ int main(int argc, char *argv[])
 For CORS middleware, the parameters are: `CORSMiddleware(allow_origins, allow_methods, allow_headers, max_age, allow_credentials)`.
 
 You can create your own custom middleware by inherting from `IMiddleware` interface and implementing the `handle` method.
-
