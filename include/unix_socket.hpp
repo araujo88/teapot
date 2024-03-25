@@ -11,7 +11,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <errno.h>
+#include <vector>
 #include "socket.hpp"
+#include "utils.hpp"
+#include "base_exceptions.hpp"
 
 namespace tpt
 {
@@ -24,6 +27,7 @@ namespace tpt
         unsigned int max_connections;
         std::string ip_address;
         std::string client_ip;
+        std::vector<std::string> ip_blacklist;
 
     public:
         UnixSocket();

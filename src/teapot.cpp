@@ -73,68 +73,76 @@ void Teapot::mainEventLoop(SOCKET client_socket)
     std::string content_type;
     unsigned int status_code = 500; // Default to internal server error in case of early failure
 
-    if (request)
+    try
     {
-        context->request = &(*request);
-        this->sanitizer_middleware.handle(context.get());
-        std::string uri = request->getUri();
-        if (uri == "/")
-            uri = "/index.html"; // Normalize root access to a specific file, e.g., index.html
-        std::string method = request->getMethod();
-        content_type = determineContentType(uri); // Determine content type early based on URI
-
-        std::cout << "[" << request->getDate() << "] " << this->socket.getClientIp() + " " << method << " " << uri << " HTTP/1.1 ";
-
-        if (method == "GET")
+        if (request)
         {
-            // Check for predefined routes or responses before attempting to read a file
-            auto routeIt = this->routes.find(uri);
-            auto jsonIt = this->json_responses.find(uri);
-            auto htmlIt = this->html_responses.find(uri);
+            context->request = &(*request);
+            this->sanitizer_middleware.handle(context.get());
+            std::string uri = request->getUri();
+            if (uri == "/")
+                uri = "/index.html"; // Normalize root access to a specific file, e.g., index.html
+            std::string method = request->getMethod();
+            content_type = determineContentType(uri); // Determine content type early based on URI
 
-            if (routeIt != this->routes.end())
+            std::cout << "[" << request->getDate() << "] " << this->socket.getClientIp() + " " << method << " " << uri << " HTTP/1.1 ";
+
+            if (method == "GET")
             {
-                body = Utils::readFileToBuffer(this->static_files_dir + routeIt->second);
-                status_code = 200;
-            }
-            else if (jsonIt != this->json_responses.end())
-            {
-                body = jsonIt->second;
-                status_code = 200;
-                content_type = "application/json";
-            }
-            else if (htmlIt != this->html_responses.end())
-            {
-                body = htmlIt->second;
-                status_code = 200;
-                content_type = "text/html";
+                // Check for predefined routes or responses before attempting to read a file
+                auto routeIt = this->routes.find(uri);
+                auto jsonIt = this->json_responses.find(uri);
+                auto htmlIt = this->html_responses.find(uri);
+
+                if (routeIt != this->routes.end())
+                {
+                    body = Utils::readFileToBuffer(this->static_files_dir + routeIt->second);
+                    status_code = 200;
+                }
+                else if (jsonIt != this->json_responses.end())
+                {
+                    body = jsonIt->second;
+                    status_code = 200;
+                    content_type = "application/json";
+                }
+                else if (htmlIt != this->html_responses.end())
+                {
+                    body = htmlIt->second;
+                    status_code = 200;
+                    content_type = "text/html";
+                }
+                else
+                {
+                    try
+                    {
+                        body = Utils::readFileToBuffer(this->static_files_dir + uri);
+                        status_code = 200;
+                    }
+                    catch (FileNotFoundException &)
+                    {
+                        body = Utils::readFileToBuffer(this->static_files_dir + "/404.html");
+                        content_type = "text/html";
+                        status_code = 404;
+                    }
+                }
             }
             else
             {
-                try
-                {
-                    body = Utils::readFileToBuffer(this->static_files_dir + uri);
-                    status_code = 200;
-                }
-                catch (FileNotFoundException &)
-                {
-                    body = Utils::readFileToBuffer(this->static_files_dir + "/404.html");
-                    content_type = "text/html";
-                    status_code = 404;
-                }
+                // If not GET, assume method not supported
+                body = Utils::readFileToBuffer(this->static_files_dir + "/405.html");
+                content_type = "text/html";
+                status_code = 405;
             }
         }
         else
         {
-            // If not GET, assume method not supported
-            body = Utils::readFileToBuffer(this->static_files_dir + "/405.html");
+            // Handle parsing failure by responding with 500 Internal Server Error
+            body = Utils::readFileToBuffer(this->static_files_dir + "/500.html");
             content_type = "text/html";
-            status_code = 405;
         }
     }
-    else
+    catch (...)
     {
-        // Handle parsing failure by responding with 500 Internal Server Error
         body = Utils::readFileToBuffer(this->static_files_dir + "/500.html");
         content_type = "text/html";
     }
@@ -210,9 +218,16 @@ void Teapot::run()
         SOCKET client_socket;
         void *client_addr = nullptr;
 
-        socket.acceptConnection(client_socket, client_addr);
-
-        std::jthread th(&Teapot::mainEventLoop, this, client_socket);
+        try
+        {
+            socket.acceptConnection(client_socket, client_addr);
+            std::jthread th(&Teapot::mainEventLoop, this, client_socket);
+        }
+        catch (IPBlackListedException &e)
+        {
+            std::cout << e.what();
+            this->socket.closeSocket(client_socket);
+        }
     }
 }
 

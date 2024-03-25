@@ -126,3 +126,24 @@ std::string Utils::sanitizePath(const std::string &path)
     }
     return sanitized;
 }
+
+void Utils::fillIPBlacklist(std::vector<std::string> &ip_blacklist)
+{
+    std::ifstream file("blacklist.txt");
+    std::string ip;
+
+    if (!file)
+    {
+        std::cerr << "Unable to open blacklist.txt for reading." << std::endl;
+    }
+
+    while (std::getline(file, ip))
+    {
+        // Assuming each line in the file contains one IP address.
+        // You might want to add validation here to ensure the line actually
+        // contains an IP address or matches your criteria.
+        ip_blacklist.push_back(ip);
+    }
+
+    file.close();
+}

@@ -21,6 +21,15 @@ namespace tpt
             return "Error - JSON parsing error";
         }
     };
+
+    class IPBlackListedException : public std::exception
+    {
+    public:
+        const char *what() const throw()
+        {
+            return "Error - IP is blacklisted";
+        }
+    };
 }
 
 #endif

@@ -17,10 +17,13 @@ UnixSocket::UnixSocket()
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
+    std::cout << "Socket created!" << std::endl;
 
     this->server_address.sin_family = AF_INET;
     this->server_address.sin_port = htons(this->port);
     this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
+
+    Utils::fillIPBlacklist(this->ip_blacklist);
 }
 
 UnixSocket::UnixSocket(unsigned int port)
@@ -37,10 +40,13 @@ UnixSocket::UnixSocket(unsigned int port)
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
+    std::cout << "Socket created!" << std::endl;
 
     this->server_address.sin_family = AF_INET;
     this->server_address.sin_port = htons(this->port);
     this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
+
+    Utils::fillIPBlacklist(this->ip_blacklist);
 }
 
 UnixSocket::UnixSocket(std::string ip_address, unsigned int port)
@@ -57,10 +63,13 @@ UnixSocket::UnixSocket(std::string ip_address, unsigned int port)
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
+    std::cout << "Socket created!" << std::endl;
 
     this->server_address.sin_family = AF_INET;
     this->server_address.sin_port = htons(this->port);
     this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
+
+    Utils::fillIPBlacklist(this->ip_blacklist);
 }
 
 UnixSocket::UnixSocket(std::string ip_address, unsigned int port, unsigned int max_connections)
@@ -82,6 +91,8 @@ UnixSocket::UnixSocket(std::string ip_address, unsigned int port, unsigned int m
     this->server_address.sin_family = AF_INET;
     this->server_address.sin_port = htons(this->port);
     this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
+
+    Utils::fillIPBlacklist(this->ip_blacklist);
 }
 
 void UnixSocket::bindSocket()
@@ -141,6 +152,14 @@ void UnixSocket::acceptConnection(SOCKET &client_socket, void *client_address)
     }
 
     this->client_ip = std::string(ip_str);
+
+    for (auto it : this->ip_blacklist)
+    {
+        if (this->client_ip == it)
+        {
+            throw IPBlackListedException();
+        }
+    }
 }
 
 ssize_t UnixSocket::receiveData(SOCKET client_socket, char *buffer, unsigned int buffer_size)

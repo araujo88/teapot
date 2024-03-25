@@ -24,6 +24,7 @@ namespace tpt
         static std::string &formatJSON(std::string &json);
         static bool isValidJSON(const std::string &str);
         static std::string sanitizePath(const std::string &path);
+        static void fillIPBlacklist(std::vector<std::string> &ip_blacklist);
     };
 }
 
