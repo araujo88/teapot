@@ -17,6 +17,7 @@ Request::Request(const std::string &raw)
     this->method = request_line.substr(0, method_end);
     size_t uri_end = request_line.find(' ', method_end + 1);
     this->uri = request_line.substr(method_end + 1, uri_end - method_end - 1);
+    this->uri = Utils::sanitizePath(this->uri);
 
     // Parse headers
     size_t headers_end = raw.find("\r\n\r\n");

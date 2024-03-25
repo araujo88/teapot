@@ -110,3 +110,15 @@ bool Utils::isValidJSON(const std::string &str)
         return !in_string && brackets.empty();
     }
 }
+
+std::string Utils::sanitizePath(const std::string &path)
+{
+    std::string sanitized = path;
+    // Simple removal of "../". You might need a more robust solution depending on requirements.
+    size_t pos;
+    while ((pos = sanitized.find("../")) != std::string::npos)
+    {
+        sanitized.erase(pos, 3);
+    }
+    return sanitized;
+}
