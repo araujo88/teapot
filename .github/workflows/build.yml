@@ -27,7 +27,9 @@ jobs:
       - name: Set C++ Standard to C++20 in Project Files
         if: runner.os == 'Windows'
         run: |
-          Get-Content teapot.vcxproj | Foreach-Object { $_ -replace '<LanguageStandard>stdcpplatest</LanguageStandard>', '<LanguageStandard>stdcpp20</LanguageStandard>' } | Set-Content teapot.vcxproj
+          $content = Get-Content teapot.vcxproj -Raw
+          $content = $content -replace '<LanguageStandard>stdcpplatest</LanguageStandard>', '<LanguageStandard>stdcpp20</LanguageStandard>'
+          Set-Content teapot.vcxproj -Value $content
         shell: pwsh
 
       - name: Build on Windows with MSBuild
