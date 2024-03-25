@@ -13,6 +13,7 @@
 #include <optional>
 #include <unordered_map>
 #include <memory>
+#include <future>
 
 #include "middleware.hpp"
 #include "cors_middleware.hpp"
@@ -68,7 +69,7 @@ namespace tpt
 
         std::optional<Request> parseRequest(int client_socket);
         std::string determineContentType(const std::string &uri);
-        void mainEventLoop(SOCKET client_socket);
+        void requestHandler(SOCKET client_socket);
 
     public:
         Teapot();

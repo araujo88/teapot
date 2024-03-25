@@ -65,7 +65,7 @@ std::string Teapot::determineContentType(const std::string &uri)
     return "text/plain";
 }
 
-void Teapot::mainEventLoop(SOCKET client_socket)
+void Teapot::requestHandler(SOCKET client_socket)
 {
     auto context = std::make_unique<Context>(nullptr, nullptr);
     auto request = parseRequest(client_socket);
@@ -224,7 +224,8 @@ void Teapot::run()
         try
         {
             socket.acceptConnection(client_socket, client_addr);
-            std::jthread th(&Teapot::mainEventLoop, this, client_socket);
+            auto res = std::async(std::launch::async, &Teapot::requestHandler, this, client_socket);
+            // std::jthread th(&Teapot::requestHandler, this, client_socket);
         }
         catch (IPBlackListedException &e)
         {
