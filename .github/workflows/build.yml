@@ -37,4 +37,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Run endpoint tests
-        run: bash ./test_endpoints.sh # Assuming your script is named test_endpoints.sh
+        run: bash ./tests/e2e_tests.sh
