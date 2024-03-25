@@ -7,6 +7,19 @@ A simple and lightweight multi-threaded web framework in C++ that serves static 
 
 ## Getting started
 
+### Pre-requisites
+
+This library uses features from C++20.
+
+#### Linux
+
+- gcc
+- make
+
+#### Windows
+
+- Visual Studio 2022
+
 ### Compiling
 
 `make clean && make`
@@ -15,7 +28,7 @@ A simple and lightweight multi-threaded web framework in C++ that serves static 
 
 In `main.cpp` file:
 
-```
+```cpp
 #include "../include/teapot.hpp"
 
 int main(int argc, char *argv[])
@@ -30,7 +43,7 @@ To start the server, run `./teapot`. This will start the server at the default u
 
 To run in a different port:
 
-```
+```cpp
 #include "../include/teapot.hpp"
 
 int main(int argc, char *argv[])
@@ -46,7 +59,7 @@ Start the server by running `./teapot <port_number>`.
 
 Optionally, the following arguments can be provided for the server instance:
 
-```
+```cpp
 #include "../include/teapot.hpp"
 
 int main(int argc, char *argv[])
@@ -68,7 +81,7 @@ int main(int argc, char *argv[])
 
 You can link a HTML file to a URL by using the method `serveFile(url, file_path)`:
 
-```
+```cpp
 #include "../include/teapot.hpp"
 
 int main(int argc, char *argv[])
@@ -82,7 +95,7 @@ int main(int argc, char *argv[])
 
 ## Returning JSON responses
 
-```
+```cpp
 #include "../include/teapot.hpp"
 
 int main(int argc, char *argv[])
@@ -96,7 +109,7 @@ int main(int argc, char *argv[])
 
 ## Returning hard-coded HTML
 
-```
+```cpp
 #include "../include/teapot.hpp"
 
 int main(int argc, char *argv[])
@@ -112,7 +125,7 @@ int main(int argc, char *argv[])
 
 Teapot web framework provides some builtin middleware such as CORS middleware, sanitizer and security headers by default. However, they can be customized to your needs by instantiating an object and then adding it to the server instance.
 
-```
+```cpp
 #include "../include/teapot.hpp"
 #include "../include/cors_middleware.hpp"
 
@@ -128,5 +141,5 @@ int main(int argc, char *argv[])
 
 For CORS middleware, the parameters are: `CORSMiddleware(allow_origins, allow_methods, allow_headers, max_age, allow_credentials)`.
 
-You can create your own custom middleware by inherting from the `Middleware` class which already contains the request and response handlers methods.
+You can create your own custom middleware by inherting from `IMiddleware` interface and implementing the `handle` method.
 
