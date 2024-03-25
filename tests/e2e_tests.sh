@@ -37,7 +37,8 @@ for i in "${!ENDPOINTS[@]}"; do # Iterate over indices of the array
   if [[ $response == $expected_code ]]; then
     echo -e "$N - ${GREEN}OK${NC} - GET $full_url"
   else
-    echo -e "$N - ${RED}FAILED${NC} - GET $full_url (HTTP code: $response)"
+    echo -e "$N - ${RED}FAILED${NC} - GET $full_url (HTTP code: $response)"]
+    exit 1
   fi
   N=$((N+1))
 done
@@ -61,6 +62,7 @@ for item in "${!TEST_CASES[@]}"; do
     echo -e "$N - ${GREEN}OK${NC} - $method $full_url"
   else
     echo -e "$N - ${RED}FAILED${NC} - $method $full_url (HTTP code: $response)"
+    exit 1
   fi
   N=$((N+1))
 done
