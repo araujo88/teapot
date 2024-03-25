@@ -3,6 +3,7 @@
 #define WIN_SOCKET_H_
 
 #include <iostream>
+#include <string>
 #include <sys/types.h>
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -36,9 +37,9 @@ namespace tpt
         ~WinSocket();
         virtual void bindSocket() override;
         virtual void listenToConnections() override;
-        virtual void acceptConnection(void &client_socket, void *client_address) override;
-        virtual int receiveData(void *client_socket, char *buffer, unsigned int buffer_size) override;
-        virtual void sendData(void *client_socket, const void *buffer, unsigned int buffer_size, int flags) override;
+        virtual void acceptConnection(int &client_socket, void *client_address) override;
+        virtual ssize_t receiveData(int client_socket, char *buffer, unsigned int buffer_size) override;
+        virtual void sendData(int client_socket, const void *buffer, unsigned int buffer_size, int flags) override;
         virtual void closeSocket() override;
         virtual void closeSocket(int client_socket) override;
     };

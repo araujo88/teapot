@@ -1,6 +1,10 @@
 #ifndef ISOCKET_H_
 #define ISOCKET_H_
 
+#ifdef _WIN32
+typedef unsigned __int64    ssize_t;
+#endif
+
 namespace tpt
 {
     class ISocket

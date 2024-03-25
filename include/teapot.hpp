@@ -2,13 +2,7 @@
 #define TEAPOT_H_
 
 #include <iostream>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <csignal>
-#include <arpa/inet.h>
 #include <fstream>
 #include <iterator>
 #include <map>
@@ -34,6 +28,10 @@
 #include "unix_socket.hpp"
 #endif
 
+#ifdef _WIN32
+#include "win_socket.hpp"
+#endif
+
 #define BUFFER_SIZE 2048
 
 namespace tpt
@@ -52,8 +50,6 @@ namespace tpt
         std::string ip_address;
         unsigned int port;
         unsigned int max_connections;
-        int server_socket;
-        struct sockaddr_in server_address;
         std::map<std::string, std::string> routes;
         std::map<std::string, std::string> html_responses;
         std::map<std::string, std::string> json_responses;
@@ -63,6 +59,9 @@ namespace tpt
         SecurityMiddleware security_middleware;
 #ifdef __linux__
         tpt::UnixSocket socket;
+#endif
+#ifdef _WIN32
+        tpt::WinSocket socket;
 #endif
 
         std::optional<Request> parseRequest(int client_socket);

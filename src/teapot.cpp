@@ -157,6 +157,9 @@ Teapot::Teapot()
 #ifdef __linux__
     this->socket = tpt::UnixSocket(this->port);
 #endif
+#ifdef _WIN32
+    this->socket = tpt::WinSocket(this->port);
+#endif
 }
 
 Teapot::Teapot(unsigned int port)
@@ -169,6 +172,9 @@ Teapot::Teapot(unsigned int port)
 #ifdef __linux__
     this->socket = tpt::UnixSocket(this->port);
 #endif
+#ifdef _WIN32
+    this->socket = tpt::WinSocket(this->port);
+#endif
 }
 
 Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir)
@@ -180,6 +186,9 @@ Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_conne
     this->static_files_dir = static_files_dir;
 #ifdef __linux__
     this->socket = tpt::UnixSocket(ip_address, port, max_connections);
+#endif
+#ifdef _WIN32
+    this->socket = tpt::WinSocket(ip_address, port, max_connections);
 #endif
 }
 

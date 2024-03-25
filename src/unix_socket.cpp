@@ -1,3 +1,4 @@
+#ifdef __linux__
 #include "../include/unix_socket.hpp"
 
 using namespace tpt;
@@ -163,3 +164,5 @@ void UnixSocket::closeSocket(int client_socket)
 }
 
 UnixSocket::~UnixSocket() {}
+
+#endif

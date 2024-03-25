@@ -134,9 +134,9 @@ void WinSocket::listenToConnections()
     }
 }
 
-void WinSocket::acceptConnection(void *socket, void *client_address)
+void WinSocket::acceptConnection(int &socket, void *client_address)
 {
-    SOCKET client_socket = *(SOCKET *)socket;
+    SOCKET client_socket = (SOCKET)socket;
 
     socklen_t client_addr_size = sizeof(client_address);
     client_socket = accept(this->server_socket, (struct sockaddr *)&client_address, &client_addr_size);
@@ -148,11 +148,11 @@ void WinSocket::acceptConnection(void *socket, void *client_address)
     }
 }
 
-int WinSocket::receiveData(void *socket, char *buffer, unsigned int buffer_size)
+ssize_t WinSocket::receiveData(int socket, char *buffer, unsigned int buffer_size)
 {
-    SOCKET client_socket = *(SOCKET *)socket;
+    SOCKET client_socket = (SOCKET)socket;
 
-    ssize_t data = recv(client_socket, (void *)buffer, buffer_size, 0);
+    ssize_t data = recv(client_socket, buffer, buffer_size, 0);
     if (data < 0)
     {
         perror("Receive error");
@@ -162,11 +162,11 @@ int WinSocket::receiveData(void *socket, char *buffer, unsigned int buffer_size)
     return data;
 }
 
-void WinSocket::sendData(void *socket, const void *buffer, unsigned int buffer_size, int flags)
+void WinSocket::sendData(int socket, const void *buffer, unsigned int buffer_size, int flags)
 {
-    SOCKET client_socket = *(SOCKET *)socket;
+    SOCKET client_socket = (SOCKET)socket;
 
-    send(client_socket, buffer, buffer_size, flags);
+    send(client_socket, (char*)buffer, buffer_size, flags);
 }
 
 void WinSocket::closeSocket()
@@ -177,9 +177,9 @@ void WinSocket::closeSocket()
     std::cout << "Socket closed!" << std::endl;
 }
 
-void WinSocket::closeSocket(void *socket)
+void WinSocket::closeSocket(int socket)
 {
-    SOCKET client_socket = *(SOCKET *)socket;
+    SOCKET client_socket = (SOCKET)socket;
 
     closesocket(client_socket);
 }
