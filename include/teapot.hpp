@@ -28,7 +28,6 @@
 #include "request.hpp"
 #include "response.hpp"
 #include "base_exceptions.hpp"
-#include "view.hpp"
 
 #ifdef __linux__
 #include "unix_socket.hpp"
