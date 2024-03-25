@@ -23,6 +23,7 @@
 #include "response.hpp"
 #include "context.hpp"
 #include "base_exceptions.hpp"
+#include "console_logger.hpp"
 
 #ifdef __linux__
 #include "unix_socket.hpp"
@@ -57,6 +58,7 @@ namespace tpt
         CORSMiddleware cors_middleware;
         SanitizerMiddleware sanitizer_middleware;
         SecurityMiddleware security_middleware;
+        ConsoleLogger logger;
 #ifdef __linux__
         tpt::UnixSocket socket;
 #endif

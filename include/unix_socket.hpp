@@ -15,6 +15,7 @@
 #include "socket.hpp"
 #include "utils.hpp"
 #include "base_exceptions.hpp"
+#include "console_logger.hpp"
 
 namespace tpt
 {
@@ -28,12 +29,14 @@ namespace tpt
         std::string ip_address;
         std::string client_ip;
         std::vector<std::string> ip_blacklist;
+        ConsoleLogger logger;
 
     public:
         UnixSocket();
-        UnixSocket(unsigned int port);
-        UnixSocket(std::string ip_address, unsigned int port);
-        UnixSocket(std::string ip_address, unsigned int port, unsigned int max_connections);
+        UnixSocket(ConsoleLogger logger);
+        UnixSocket(ConsoleLogger logger, unsigned int port);
+        UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned int port);
+        UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned int port, unsigned int max_connections);
         ~UnixSocket();
         std::string getClientIp();
         virtual void bindSocket() override;

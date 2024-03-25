@@ -8,8 +8,9 @@ UnixSocket::UnixSocket()
     this->ip_address = "127.0.0.1";
     this->port = 8000;
     this->max_connections = 10;
+    this->logger = ConsoleLogger();
 
-    std::cout << "Creating socket ..." << std::endl;
+    LOG_INFO(logger, "Creating socket ...");
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (this->server_socket < 0)
     {
@@ -26,13 +27,38 @@ UnixSocket::UnixSocket()
     Utils::fillIPBlacklist(this->ip_blacklist);
 }
 
-UnixSocket::UnixSocket(unsigned int port)
+UnixSocket::UnixSocket(ConsoleLogger logger)
+{
+    this->ip_address = "127.0.0.1";
+    this->port = 8000;
+    this->max_connections = 10;
+    this->logger = logger;
+
+    LOG_INFO(logger, "Creating socket ...");
+    this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (this->server_socket < 0)
+    {
+        perror("Socket failed");
+        std::cout << "Error code: " + errno << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    std::cout << "Socket created!" << std::endl;
+
+    this->server_address.sin_family = AF_INET;
+    this->server_address.sin_port = htons(this->port);
+    this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
+
+    Utils::fillIPBlacklist(this->ip_blacklist);
+}
+
+UnixSocket::UnixSocket(ConsoleLogger logger, unsigned int port)
 {
     this->ip_address = "127.0.0.1";
     this->port = port;
     this->max_connections = 10;
+    this->logger = logger;
 
-    std::cout << "Creating socket ..." << std::endl;
+    LOG_INFO(logger, "Creating socket ...");
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (this->server_socket < 0)
     {
@@ -49,13 +75,14 @@ UnixSocket::UnixSocket(unsigned int port)
     Utils::fillIPBlacklist(this->ip_blacklist);
 }
 
-UnixSocket::UnixSocket(std::string ip_address, unsigned int port)
+UnixSocket::UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned int port)
 {
     this->ip_address = ip_address;
     this->port = port;
     this->max_connections = 10;
+    this->logger = logger;
 
-    std::cout << "Creating socket ..." << std::endl;
+    LOG_INFO(logger, "Creating socket ...");
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (this->server_socket < 0)
     {
@@ -63,7 +90,7 @@ UnixSocket::UnixSocket(std::string ip_address, unsigned int port)
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << "Socket created!" << std::endl;
+    LOG_INFO(logger, "Socket created!");
 
     this->server_address.sin_family = AF_INET;
     this->server_address.sin_port = htons(this->port);
@@ -72,13 +99,14 @@ UnixSocket::UnixSocket(std::string ip_address, unsigned int port)
     Utils::fillIPBlacklist(this->ip_blacklist);
 }
 
-UnixSocket::UnixSocket(std::string ip_address, unsigned int port, unsigned int max_connections)
+UnixSocket::UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned int port, unsigned int max_connections)
 {
     this->ip_address = ip_address;
     this->port = port;
     this->max_connections = max_connections;
+    this->logger = logger;
 
-    std::cout << "Creating socket ..." << std::endl;
+    LOG_INFO(logger, "Creating socket ...");
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (this->server_socket < 0)
     {
@@ -86,7 +114,7 @@ UnixSocket::UnixSocket(std::string ip_address, unsigned int port, unsigned int m
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << "Socket created!" << std::endl;
+    LOG_INFO(logger, "Socket created!");
 
     this->server_address.sin_family = AF_INET;
     this->server_address.sin_port = htons(this->port);
@@ -97,15 +125,15 @@ UnixSocket::UnixSocket(std::string ip_address, unsigned int port, unsigned int m
 
 void UnixSocket::bindSocket()
 {
-    std::cout << "Binding socket ..." << std::endl;
+
+    LOG_INFO(logger, "Binding socket ...");
     if ((bind(this->server_socket, (struct sockaddr *)&this->server_address, sizeof(this->server_address))) < 0)
     {
         perror("Bind failed");
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << "Binding done!" << std::endl;
-    std::cout << "Listening to connections ..." << std::endl;
+    LOG_INFO(logger, "Binding done! Listening to connections ...");
 }
 
 void UnixSocket::listenToConnections()

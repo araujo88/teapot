@@ -141,7 +141,7 @@ void Teapot::mainEventLoop(SOCKET client_socket)
             content_type = "text/html";
         }
     }
-    catch (...)
+    catch (std::exception &e)
     {
         body = Utils::readFileToBuffer(this->static_files_dir + "/500.html");
         content_type = "text/html";
@@ -169,8 +169,9 @@ Teapot::Teapot()
     this->sanitizer_middleware = SanitizerMiddleware();
     this->cors_middleware = CORSMiddleware();
     this->security_middleware = SecurityMiddleware();
+    this->logger = ConsoleLogger();
 #ifdef __linux__
-    this->socket = tpt::UnixSocket(this->port);
+    this->socket = tpt::UnixSocket(this->logger, this->port);
 #endif
 #ifdef _WIN32
     this->socket = tpt::WinSocket(this->port);
@@ -184,8 +185,9 @@ Teapot::Teapot(unsigned int port)
     this->max_connections = 10;
     this->logging_type = DEFAULT;
     this->static_files_dir = "static";
+    this->logger = ConsoleLogger();
 #ifdef __linux__
-    this->socket = tpt::UnixSocket(this->port);
+    this->socket = tpt::UnixSocket(this->logger, this->port);
 #endif
 #ifdef _WIN32
     this->socket = tpt::WinSocket(this->port);
@@ -199,8 +201,9 @@ Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_conne
     this->max_connections = max_connections;
     this->logging_type = logging_type;
     this->static_files_dir = static_files_dir;
+    this->logger = ConsoleLogger();
 #ifdef __linux__
-    this->socket = tpt::UnixSocket(ip_address, port, max_connections);
+    this->socket = tpt::UnixSocket(logger, ip_address, port, max_connections);
 #endif
 #ifdef _WIN32
     this->socket = tpt::WinSocket(ip_address, port, max_connections);
