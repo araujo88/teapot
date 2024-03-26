@@ -180,40 +180,9 @@ void Teapot::requestHandler(SOCKET client_socket)
     this->socket.closeSocket(client_socket);
 }
 
-Teapot::Teapot()
-{
-    this->ip_address = "127.0.0.1";
-    this->port = 8000;
-    this->max_connections = 10;
-    this->logging_type = DEFAULT;
-    this->static_files_dir = "static";
-    this->sanitizer_middleware = SanitizerMiddleware();
-    this->cors_middleware = CORSMiddleware();
-    this->security_middleware = SecurityMiddleware();
-    this->logger = ConsoleLogger();
-#ifdef __linux__
-    this->socket = tpt::UnixSocket(this->logger, this->port);
-#endif
-#ifdef _WIN32
-    this->socket = tpt::WinSocket(this->port);
-#endif
-}
+Teapot::Teapot() : Teapot("127.0.0.1", 8000, 10, DEFAULT, "static") {}
 
-Teapot::Teapot(unsigned int port)
-{
-    this->ip_address = "127.0.0.1";
-    this->port = port;
-    this->max_connections = 10;
-    this->logging_type = DEFAULT;
-    this->static_files_dir = "static";
-    this->logger = ConsoleLogger();
-#ifdef __linux__
-    this->socket = tpt::UnixSocket(this->logger, this->port);
-#endif
-#ifdef _WIN32
-    this->socket = tpt::WinSocket(this->port);
-#endif
-}
+Teapot::Teapot(unsigned int port) : Teapot("127.0.0.1", port, 10, DEFAULT, "static") {}
 
 Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_connections, logging logging_type, std::string static_files_dir)
 {
@@ -222,12 +191,16 @@ Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_conne
     this->max_connections = max_connections;
     this->logging_type = logging_type;
     this->static_files_dir = static_files_dir;
+    this->sanitizer_middleware = SanitizerMiddleware();
+    this->cors_middleware = CORSMiddleware();
+    this->security_middleware = SecurityMiddleware();
     this->logger = ConsoleLogger();
+    // Conditional compilation based on the operating system
 #ifdef __linux__
-    this->socket = tpt::UnixSocket(logger, ip_address, port, max_connections);
+    this->socket = tpt::UnixSocket(this->logger, this->ip_address, this->port, this->max_connections);
 #endif
 #ifdef _WIN32
-    this->socket = tpt::WinSocket(ip_address, port, max_connections);
+    this->socket = tpt::WinSocket(this->ip_address, this->port, this->max_connections);
 #endif
 }
 
@@ -265,11 +238,17 @@ void Teapot::run()
             std::cout << e.what();
             this->socket.closeSocket(client_socket);
         }
+        catch (SocketAcceptException &)
+        {
+            continue;
+        }
+        catch (SocketCloseException &)
+        {
+            exit(EXIT_FAILURE);
+        }
     }
 
     LOG_INFO(logger, "Shutting down...");
-    this->socket.closeSocket();
-    sleep(3);
 }
 
 void Teapot::serveFile(std::string url, std::string file_path)

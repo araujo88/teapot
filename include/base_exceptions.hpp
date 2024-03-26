@@ -9,7 +9,7 @@ namespace tpt
     public:
         const char *what() const throw()
         {
-            return "Error - file not found";
+            return "File not found";
         }
     };
 
@@ -18,7 +18,7 @@ namespace tpt
     public:
         const char *what() const throw()
         {
-            return "Error - JSON parsing error";
+            return "JSON parsing error";
         }
     };
 
@@ -27,7 +27,70 @@ namespace tpt
     public:
         const char *what() const throw()
         {
-            return "Error - IP is blacklisted";
+            return "IP is blacklisted";
+        }
+    };
+
+    class SocketCreationException : public std::exception
+    {
+    public:
+        const char *what() const throw()
+        {
+            return "Error when creating socket";
+        }
+    };
+
+    class SocketCloseException : public std::exception
+    {
+    public:
+        const char *what() const throw()
+        {
+            return "Error closing socket";
+        }
+    };
+
+    class SocketBindingException : public std::exception
+    {
+    public:
+        const char *what() const throw()
+        {
+            return "Error binding socket";
+        }
+    };
+
+    class SocketListenException : public std::exception
+    {
+    public:
+        const char *what() const throw()
+        {
+            return "Error listening to connections";
+        }
+    };
+
+    class SocketAcceptException : public std::exception
+    {
+    public:
+        const char *what() const throw()
+        {
+            return "Error accepting connections";
+        }
+    };
+
+    class SocketReceiveException : public std::exception
+    {
+    public:
+        const char *what() const throw()
+        {
+            return "Error receiving data";
+        }
+    };
+
+    class SocketSendException : public std::exception
+    {
+    public:
+        const char *what() const throw()
+        {
+            return "Error sending data";
         }
     };
 }

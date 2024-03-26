@@ -3,101 +3,13 @@
 
 using namespace tpt;
 
-UnixSocket::UnixSocket()
-{
-    this->ip_address = "127.0.0.1";
-    this->port = 8000;
-    this->max_connections = 10;
-    this->logger = ConsoleLogger();
+UnixSocket::UnixSocket() : UnixSocket(ConsoleLogger()) {}
 
-    LOG_INFO(logger, "Creating socket ...");
-    this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->server_socket < 0)
-    {
-        perror("Socket failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    LOG_INFO(logger, "Socket created!");
+UnixSocket::UnixSocket(ConsoleLogger logger) : UnixSocket(logger, "127.0.0.1", 8000, 10) {}
 
-    this->server_address.sin_family = AF_INET;
-    this->server_address.sin_port = htons(this->port);
-    this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
+UnixSocket::UnixSocket(ConsoleLogger logger, unsigned int port) : UnixSocket(logger, "127.0.0.1", port, 10) {}
 
-    Utils::fillIPBlacklist(this->ip_blacklist);
-}
-
-UnixSocket::UnixSocket(ConsoleLogger logger)
-{
-    this->ip_address = "127.0.0.1";
-    this->port = 8000;
-    this->max_connections = 10;
-    this->logger = logger;
-
-    LOG_INFO(logger, "Creating socket ...");
-    this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->server_socket < 0)
-    {
-        perror("Socket failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    LOG_INFO(logger, "Socket created!");
-
-    this->server_address.sin_family = AF_INET;
-    this->server_address.sin_port = htons(this->port);
-    this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
-
-    Utils::fillIPBlacklist(this->ip_blacklist);
-}
-
-UnixSocket::UnixSocket(ConsoleLogger logger, unsigned int port)
-{
-    this->ip_address = "127.0.0.1";
-    this->port = port;
-    this->max_connections = 10;
-    this->logger = logger;
-
-    LOG_INFO(logger, "Creating socket ...");
-    this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->server_socket < 0)
-    {
-        perror("Socket failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    LOG_INFO(logger, "Socket created!");
-
-    this->server_address.sin_family = AF_INET;
-    this->server_address.sin_port = htons(this->port);
-    this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
-
-    Utils::fillIPBlacklist(this->ip_blacklist);
-}
-
-UnixSocket::UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned int port)
-{
-    this->ip_address = ip_address;
-    this->port = port;
-    this->max_connections = 10;
-    this->logger = logger;
-
-    LOG_INFO(logger, "Creating socket ...");
-    this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->server_socket < 0)
-    {
-        perror("Socket failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    LOG_INFO(logger, "Socket created!");
-
-    this->server_address.sin_family = AF_INET;
-    this->server_address.sin_port = htons(this->port);
-    this->server_address.sin_addr.s_addr = inet_addr(this->ip_address.c_str());
-
-    Utils::fillIPBlacklist(this->ip_blacklist);
-}
+UnixSocket::UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned int port) : UnixSocket(logger, ip_address, port, 10) {}
 
 UnixSocket::UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned int port, unsigned int max_connections)
 {
@@ -110,9 +22,7 @@ UnixSocket::UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned in
     this->server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (this->server_socket < 0)
     {
-        perror("Socket failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(EXIT_FAILURE);
+        throw SocketCreationException();
     }
     LOG_INFO(logger, "Socket created!");
 
@@ -129,11 +39,8 @@ void UnixSocket::bindSocket()
     LOG_INFO(logger, "Binding socket ...");
     if ((bind(this->server_socket, (struct sockaddr *)&this->server_address, sizeof(this->server_address))) < 0)
     {
-        perror("Bind failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(EXIT_FAILURE);
+        throw SocketBindingException();
     }
-    this->setSocketTimeout(this->server_socket, 5);
     LOG_INFO(logger, "Binding done! Listening to connections ...");
 }
 
@@ -141,9 +48,7 @@ void UnixSocket::listenToConnections()
 {
     if ((listen(this->server_socket, this->max_connections)) < 0)
     {
-        perror("Listen failed");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(1);
+        throw SocketListenException();
     }
 }
 
@@ -152,12 +57,11 @@ void UnixSocket::acceptConnection(SOCKET &client_socket, void *client_address)
     struct sockaddr_storage client_addr_storage;
     socklen_t client_addr_size = sizeof(client_addr_storage);
 
+    this->setSocketTimeout(this->server_socket, 5);
     client_socket = accept(this->server_socket, (struct sockaddr *)&client_addr_storage, &client_addr_size);
     if (client_socket < 0)
     {
-        perror("Accept failed");
-        std::cout << "Error code: " << std::to_string(errno) << std::endl;
-        exit(EXIT_FAILURE);
+        throw SocketAcceptException();
     }
 
     // Assuming client_address is meant to store the result
@@ -198,16 +102,17 @@ ssize_t UnixSocket::receiveData(SOCKET client_socket, char *buffer, unsigned int
     ssize_t data = recv(client_socket, (void *)buffer, buffer_size, 0);
     if (data < 0)
     {
-        perror("Receive error");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(1);
+        throw SocketReceiveException();
     }
     return data;
 }
 
 void UnixSocket::sendData(SOCKET client_socket, const void *buffer, unsigned int buffer_size, int flags)
 {
-    send(client_socket, buffer, buffer_size, flags);
+    if (send(client_socket, buffer, buffer_size, flags) == -1)
+    {
+        throw SocketSendException();
+    }
 }
 
 void UnixSocket::closeSocket()
@@ -221,20 +126,16 @@ void UnixSocket::closeSocket()
     LOG_INFO(logger, "Closing socket ...");
     if (shutdown(this->server_socket, SHUT_RDWR) == -1)
     {
-        perror("An error occurred while shutting down the socket: ");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(EXIT_FAILURE);
+        throw SocketCloseException();
     }
     if (close(this->server_socket) == 0)
     {
         LOG_INFO(logger, "Socket closed!");
-        exit(EXIT_SUCCESS);
+        return;
     }
     else
     {
-        perror("An error occurred while closing the socket: ");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(EXIT_FAILURE);
+        throw SocketCloseException();
     }
 }
 
@@ -242,9 +143,7 @@ void UnixSocket::closeSocket(SOCKET client_socket)
 {
     if (shutdown(client_socket, SHUT_RDWR) == -1)
     {
-        perror("An error occurred while shutting down the socket: ");
-        std::cout << "Error code: " + errno << std::endl;
-        exit(EXIT_FAILURE);
+        throw SocketCloseException();
     }
     close(client_socket);
 
