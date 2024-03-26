@@ -18,7 +18,7 @@ UnixSocket::UnixSocket()
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << "Socket created!" << std::endl;
+    LOG_INFO(logger, "Socket created!");
 
     this->server_address.sin_family = AF_INET;
     this->server_address.sin_port = htons(this->port);
@@ -42,7 +42,7 @@ UnixSocket::UnixSocket(ConsoleLogger logger)
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << "Socket created!" << std::endl;
+    LOG_INFO(logger, "Socket created!");
 
     this->server_address.sin_family = AF_INET;
     this->server_address.sin_port = htons(this->port);
@@ -66,7 +66,7 @@ UnixSocket::UnixSocket(ConsoleLogger logger, unsigned int port)
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << "Socket created!" << std::endl;
+    LOG_INFO(logger, "Socket created!");
 
     this->server_address.sin_family = AF_INET;
     this->server_address.sin_port = htons(this->port);
