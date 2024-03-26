@@ -29,6 +29,7 @@ namespace tpt
         std::string ip_address;
         std::string client_ip;
         std::vector<std::string> ip_blacklist;
+        std::vector<SOCKET> client_sockets;
         ConsoleLogger logger;
 
     public:
@@ -46,6 +47,7 @@ namespace tpt
         virtual void sendData(SOCKET client_socket, const void *buffer, unsigned int buffer_size, int flags) override;
         virtual void closeSocket() override;
         virtual void closeSocket(SOCKET client_socket) override;
+        virtual void setSocketTimeout(SOCKET sock, int timeoutSec) override;
     };
 }
 

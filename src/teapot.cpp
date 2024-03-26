@@ -3,6 +3,27 @@
 
 using namespace tpt;
 
+volatile std::sig_atomic_t signal_received = 0;
+
+#ifdef __linux__
+extern "C" void signalHandler(int signal)
+{
+    signal_received = signal;
+}
+#endif
+
+#ifdef _WIN32
+BOOL WINAPI consoleHandler(DWORD signal)
+{
+    if (signal == CTRL_C_EVENT || signal == CTRL_CLOSE_EVENT)
+    {
+        signal_received = 1;
+        return TRUE;
+    }
+    return FALSE;
+}
+#endif
+
 std::optional<Request> Teapot::parseRequest(int client_socket)
 {
     char buffer[BUFFER_SIZE] = {0};
@@ -212,9 +233,21 @@ Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_conne
 
 void Teapot::run()
 {
+#ifdef __linux__
+    std::signal(SIGINT, signalHandler);
+    std::signal(SIGTERM, signalHandler);
+#endif
+#ifdef _WIN32
+    if (!SetConsoleCtrlHandler(consoleHandler, TRUE))
+    {
+        std::cerr << "ERROR: Could not set control handler" << std::endl;
+        return;
+    }
+#endif
+
     socket.bindSocket();
 
-    while (true)
+    while (!signal_received)
     {
         socket.listenToConnections();
 
@@ -233,6 +266,10 @@ void Teapot::run()
             this->socket.closeSocket(client_socket);
         }
     }
+
+    LOG_INFO(logger, "Shutting down...");
+    this->socket.closeSocket();
+    sleep(3);
 }
 
 void Teapot::serveFile(std::string url, std::string file_path)

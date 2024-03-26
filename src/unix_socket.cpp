@@ -133,6 +133,7 @@ void UnixSocket::bindSocket()
         std::cout << "Error code: " + errno << std::endl;
         exit(EXIT_FAILURE);
     }
+    this->setSocketTimeout(this->server_socket, 5);
     LOG_INFO(logger, "Binding done! Listening to connections ...");
 }
 
@@ -188,6 +189,8 @@ void UnixSocket::acceptConnection(SOCKET &client_socket, void *client_address)
             throw IPBlackListedException();
         }
     }
+
+    this->client_sockets.push_back(client_socket);
 }
 
 ssize_t UnixSocket::receiveData(SOCKET client_socket, char *buffer, unsigned int buffer_size)
@@ -209,7 +212,13 @@ void UnixSocket::sendData(SOCKET client_socket, const void *buffer, unsigned int
 
 void UnixSocket::closeSocket()
 {
-    std::cout << "Closing socket ..." << std::endl;
+    LOG_INFO(logger, "Cleaning up client sockets ...");
+    for (auto &it : this->client_sockets)
+    {
+        this->closeSocket(it);
+    }
+
+    LOG_INFO(logger, "Closing socket ...");
     if (shutdown(this->server_socket, SHUT_RDWR) == -1)
     {
         perror("An error occurred while shutting down the socket: ");
@@ -218,7 +227,7 @@ void UnixSocket::closeSocket()
     }
     if (close(this->server_socket) == 0)
     {
-        std::cout << "Socket closed!" << std::endl;
+        LOG_INFO(logger, "Socket closed!");
         exit(EXIT_SUCCESS);
     }
     else
@@ -231,12 +240,34 @@ void UnixSocket::closeSocket()
 
 void UnixSocket::closeSocket(SOCKET client_socket)
 {
+    if (shutdown(client_socket, SHUT_RDWR) == -1)
+    {
+        perror("An error occurred while shutting down the socket: ");
+        std::cout << "Error code: " + errno << std::endl;
+        exit(EXIT_FAILURE);
+    }
     close(client_socket);
+
+    auto it = std::find(this->client_sockets.begin(), this->client_sockets.end(), client_socket);
+
+    // Check if element was found before erasing
+    if (it != this->client_sockets.end())
+    {
+        this->client_sockets.erase(it);
+    }
 }
 
 std::string UnixSocket::getClientIp()
 {
     return this->client_ip;
+}
+
+void UnixSocket::setSocketTimeout(SOCKET sock, int timeoutSec)
+{
+    struct timeval tv;
+    tv.tv_sec = timeoutSec; // Seconds
+    tv.tv_usec = 0;         // Microseconds
+    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof tv);
 }
 
 UnixSocket::~UnixSocket() {}

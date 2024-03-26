@@ -31,6 +31,7 @@
 #endif
 
 #ifdef _WIN32
+#include <windows.h>
 #include "win_socket.hpp"
 #endif
 

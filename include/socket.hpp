@@ -20,6 +20,7 @@ namespace tpt
         virtual void sendData(SOCKET client_socket, const void *buffer, unsigned int buffer_size, int flags) = 0;
         virtual void closeSocket() = 0;
         virtual void closeSocket(SOCKET client_socket) = 0;
+        virtual void setSocketTimeout(SOCKET sock, int timeoutSec) = 0;
     };
 }
 

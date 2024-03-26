@@ -162,6 +162,7 @@ void WinSocket::bindSocket()
         WSACleanup();
         exit(EXIT_FAILURE);
     }
+    this->setSocketTimeout(this->server_socket, 5);
     std::cout << "Binding done!" << std::endl;
     std::cout << "Listening to connections ..." << std::endl;
 }
@@ -247,6 +248,21 @@ void WinSocket::closeSocket()
 void WinSocket::closeSocket(SOCKET client_socket)
 {
     closesocket(client_socket);
+}
+
+void WinSocket::setSocketTimeout(SOCKET sock, int timeoutSec)
+{
+    // Initialize the timeout value
+    DWORD timeout = timeoutSec * 1000; // Convert to milliseconds, as required by Windows
+
+    // Set the receive timeout option
+    int result = setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout));
+    if (result == SOCKET_ERROR)
+    {
+        std::printf("Error setting timeout: %d\n", WSAGetLastError());
+        WSACleanup();
+        exit(EXIT_FAILURE);
+    }
 }
 
 WinSocket::~WinSocket() {}
