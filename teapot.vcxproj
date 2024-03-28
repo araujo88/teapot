@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalOptions>/std:c++20 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      <ClCompile>
+        <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+        <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+        <WarningLevel>Level3</WarningLevel>
+        <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+        <Optimization>Disabled</Optimization>
+        <!-- LanguageStandard specification here is redundant if the general ItemDefinitionGroup above is used, but can be kept for clarity -->
+        <LanguageStandard>stdcpp20</LanguageStandard>
+      </ClCompile>
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -147,9 +163,4 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <ItemGroup>
-    <ClCompile>
-      <AdditionalOptions>/std:c++20 %(AdditionalOptions)</AdditionalOptions>
-    </ClCompile>
-  </ItemGroup>
 </Project>
