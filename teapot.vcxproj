@@ -75,10 +75,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalOptions>/std:c++20 %(AdditionalOptions)</AdditionalOptions>
-      <LanguageStandard>stdcpp20
-
-</LanguageStandard>
+    <AdditionalOptions>/std:c++20 %(AdditionalOptions)</AdditionalOptions>
+    <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
