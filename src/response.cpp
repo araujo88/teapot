@@ -24,6 +24,8 @@ Response::Response(std::string body, std::string content_type, unsigned int stat
         response_stream << i;
     }
     response_stream << this->body;
+
+    this->addHeader("Server: Teapot");
     this->raw = response_stream.str();
 }
 
