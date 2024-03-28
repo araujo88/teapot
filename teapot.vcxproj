@@ -104,8 +104,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\console_logger.cpp" />
     <ClCompile Include="src\cors_middleware.cpp" />
     <ClCompile Include="src\http_status.cpp" />
+    <ClCompile Include="src\logger.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\request.cpp" />
     <ClCompile Include="src\response.cpp" />
@@ -118,9 +120,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\base_exceptions.hpp" />
+    <ClInclude Include="include\console_logger.hpp" />
     <ClInclude Include="include\context.hpp" />
     <ClInclude Include="include\cors_middleware.hpp" />
     <ClInclude Include="include\http_status.hpp" />
+    <ClInclude Include="include\logger.hpp" />
     <ClInclude Include="include\middleware.hpp" />
     <ClInclude Include="include\request.hpp" />
     <ClInclude Include="include\response.hpp" />

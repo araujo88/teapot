@@ -20,7 +20,7 @@ namespace tpt
         case LogLevel::WARNING:
             colorCode = "\033[33m"; // Yellow
             break;
-        case LogLevel::ERROR:
+        case LogLevel::ERR:
             colorCode = "\033[31m"; // Red
             break;
         case LogLevel::CRITICAL:

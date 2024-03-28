@@ -31,7 +31,9 @@ namespace tpt
         unsigned int port;
         unsigned int max_connections;
         std::string ip_address;
+        std::string client_ip;
         std::vector<std::string> ip_blacklist;
+        std::vector<SOCKET> client_sockets;
         ConsoleLogger logger;
 
     public:

@@ -200,7 +200,7 @@ Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_conne
     this->socket = tpt::UnixSocket(this->logger, this->ip_address, this->port, this->max_connections);
 #endif
 #ifdef _WIN32
-    this->socket = tpt::WinSocket(this->ip_address, this->port, this->max_connections);
+    this->socket = tpt::WinSocket(this->logger, this->ip_address, this->port, this->max_connections);
 #endif
 }
 
