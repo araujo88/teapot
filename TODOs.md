@@ -8,7 +8,7 @@
    - Preload commonly accessed files into memory to serve them faster.
    - Implement file caching strategies to reduce disk I/O.
 
-- [ ] 3. **Concurrency and Threading:**
+- [X] 3. **Concurrency and Threading:**
    - Review thread creation in `runServer` to ensure efficient handling of concurrent connections.
    - Consider using a thread pool to limit the overhead of thread creation and destruction.
 
