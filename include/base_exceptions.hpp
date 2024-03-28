@@ -1,97 +1,129 @@
 #ifndef BASE_EXCEPTIONS_H_
 #define BASE_EXCEPTIONS_H_
-#include <exception>
+
+#include <stdexcept>
+#include <string>
+#include <sstream>
 
 namespace tpt
 {
-    class FileNotFoundException : public std::exception
+    class BaseException : public std::runtime_error
     {
     public:
-        const char *what() const throw()
+        BaseException(const std::string &message = "An error occurred", int errorCode = -1)
+            : std::runtime_error(message), m_errorCode(errorCode)
         {
-            return "File not found";
+            // Prepare the full message including the error code
+            std::ostringstream ss;
+            ss << message << " Error code: " << errorCode << ".";
+            m_fullMessage = ss.str();
         }
+
+        int getErrorCode() const noexcept
+        {
+            return m_errorCode;
+        }
+
+        virtual const char *what() const noexcept override
+        {
+            return m_fullMessage.c_str();
+        }
+
+    protected:
+        int m_errorCode;
+
+    private:
+        std::string m_fullMessage;
     };
 
-    class InvalidJSONException : public std::exception
+    class FileNotFoundException : public BaseException
     {
     public:
-        const char *what() const throw()
-        {
-            return "JSON parsing error";
-        }
+        FileNotFoundException(
+            const std::string &message = "File not found",
+            int errorCode = -1)
+            : BaseException(message, errorCode) {}
     };
 
-    class IPBlackListedException : public std::exception
+    class InvalidJSONException : public BaseException
     {
     public:
-        const char *what() const throw()
-        {
-            return "IP is blacklisted";
-        }
+        InvalidJSONException(
+            const std::string &message = "JSON parsing error",
+            int errorCode = -1)
+            : BaseException(message, errorCode) {}
     };
 
-    class SocketCreationException : public std::exception
+    class IPBlackListedException : public BaseException
     {
     public:
-        const char *what() const throw()
-        {
-            return "Error when creating socket";
-        }
+        IPBlackListedException(
+            const std::string &message = "IP is blacklisted",
+            int errorCode = -1)
+            : BaseException(message, errorCode) {}
     };
 
-    class SocketCloseException : public std::exception
+    class SocketCreationException : public BaseException
     {
     public:
-        const char *what() const throw()
-        {
-            return "Error closing socket";
-        }
+        SocketCreationException(
+            const std::string &message = "Error when creating socket",
+            int errorCode = -1)
+            : BaseException(message, errorCode) {}
     };
 
-    class SocketBindingException : public std::exception
+    class SocketCloseException : public BaseException
     {
     public:
-        const char *what() const throw()
-        {
-            return "Error binding socket";
-        }
+        SocketCloseException(
+            const std::string &message = "Error closing socket",
+            int errorCode = -1)
+            : BaseException(message, errorCode) {}
     };
 
-    class SocketListenException : public std::exception
+    class SocketBindingException : public BaseException
     {
     public:
-        const char *what() const throw()
-        {
-            return "Error listening to connections";
-        }
+        SocketBindingException(
+            const std::string &message = "Error binding socket",
+            int errorCode = -1)
+            : BaseException(message, errorCode) {}
     };
 
-    class SocketAcceptException : public std::exception
+    class SocketListenException : public BaseException
     {
     public:
-        const char *what() const throw()
-        {
-            return "Error accepting connections";
-        }
+        SocketListenException(
+            const std::string &message = "Error listening to connections",
+            int errorCode = -1)
+            : BaseException(message, errorCode) {}
     };
 
-    class SocketReceiveException : public std::exception
+    class SocketAcceptException : public BaseException
     {
     public:
-        const char *what() const throw()
-        {
-            return "Error receiving data";
-        }
+        SocketAcceptException(
+            const std::string &message = "Error accepting connections",
+            int errorCode = -1)
+            : BaseException(message, errorCode) {}
     };
 
-    class SocketSendException : public std::exception
+    class SocketReceiveException : public BaseException
     {
     public:
-        const char *what() const throw()
-        {
-            return "Error sending data";
-        }
+        SocketReceiveException(
+            const std::string &message = "Error receiving data",
+            int errorCode = -1)
+            : BaseException(message, errorCode) {}
+    };
+
+    class SocketSendException : public BaseException
+    {
+    public:
+        SocketSendException(
+            const std::string &message = "Error sending data",
+            int errorCode = -1)
+            : BaseException(message, errorCode) {}
     };
 }
 
