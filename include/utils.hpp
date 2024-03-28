@@ -16,8 +16,19 @@ namespace tpt
 {
     class Utils
     {
+    private:
+        Utils() {}
+        Utils(const Utils &) = delete;
+        Utils &operator=(const Utils &) = delete;
+
     public:
-        static std::string readFileToBuffer(std::string filename);
+        static Utils &getInstance()
+        {
+            static Utils instance;
+            return instance;
+        }
+
+        static std::string readFileToBuffer(const std::string &filename);
         static std::string date();
         static std::string btos(bool x);
         static std::string &replaceString(std::string &s, const std::string &from, const std::string &to);

@@ -2,7 +2,7 @@
 
 using namespace tpt;
 
-std::string Utils::readFileToBuffer(std::string filename)
+std::string Utils::readFileToBuffer(const std::string &filename)
 {
     // Use std::filesystem to handle paths correctly across different OSes
     std::filesystem::path filePath{filename};
