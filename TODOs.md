@@ -57,3 +57,6 @@
 
 - [ ] 15. **Client-side Performance:**
     - Although the server primarily serves static content, ensure served pages are optimized for client-side performance (e.g., minification of CSS and JavaScript).
+     
+ - [ ] 16. **IPv6 Support:**
+    Implement dual-stack support to ensure the server can handle connections over both IPv4 and IPv6 networks.
