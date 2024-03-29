@@ -1,27 +1,34 @@
 CC=g++
-CC_FLAGS=-g -Wall -Wpedantic -Wextra -std=c++20
+STD_FLAGS=-Wall -Wpedantic -Wextra -std=c++20
+OPT_FLAGS=-O3 -march=native -flto -funroll-loops
+DEBUG_FLAGS=-g -Og -march=native -flto
+CC_FLAGS=$(STD_FLAGS) $(OPT_FLAGS)
 
 SRC_DIR=src
 HDR_DIR=include
 OBJ_DIR=obj
 
-# source and object files
 SRC_FILES=$(wildcard $(SRC_DIR)/*.cpp)
 OBJ_FILES=$(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES))
 
 BIN_FILE=teapot
 
-all: $(OBJ_DIR) $(BIN_FILE)
+.PHONY: all debug clean
 
-$(BIN_FILE): $(OBJ_FILES)
-	$(CC) $(CC_FLAGS) $^ -I$(HDR_DIR) -o $@
+all: CC_FLAGS += $(OPT_FLAGS)
+all: $(BIN_FILE)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CC) $(CC_FLAGS) -c $^ -I$(HDR_DIR) -o $@
+debug: CC_FLAGS=$(STD_FLAGS) $(DEBUG_FLAGS)
+debug: $(BIN_FILE)
+
+$(BIN_FILE): $(OBJ_DIR) $(OBJ_FILES)
+	$(CC) $(CC_FLAGS) $(OBJ_FILES) -I$(HDR_DIR) -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	$(CC) $(CC_FLAGS) -c $< -I$(HDR_DIR) -o $@
 
 $(OBJ_DIR):
-	mkdir $@
+	mkdir -p $@
 
 clean:
-	rm -rf $(BIN_FILE) $(OBJ_DIR) teapot
-
+	rm -rf $(BIN_FILE) $(OBJ_DIR)
