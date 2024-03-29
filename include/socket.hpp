@@ -15,7 +15,7 @@ namespace tpt
     public:
         virtual void bindSocket() = 0;
         virtual void listenToConnections() = 0;
-        virtual void acceptConnection(SOCKET &client_socket, void *client_address) = 0;
+        virtual bool acceptConnection(SOCKET &client_socket, void *client_address) = 0;
         virtual ssize_t receiveData(SOCKET client_socket, char *buffer, unsigned int buffer_size) = 0;
         virtual void sendData(SOCKET client_socket, const void *buffer, unsigned int buffer_size, int flags) = 0;
         virtual void closeSocket() = 0;

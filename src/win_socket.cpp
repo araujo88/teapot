@@ -56,7 +56,7 @@ void WinSocket::listenToConnections()
     }
 }
 
-void WinSocket::acceptConnection(SOCKET &client_socket, void *client_address)
+bool WinSocket::acceptConnection(SOCKET &client_socket, void *client_address)
 {
     struct sockaddr_storage client_addr_storage;
     int client_addr_size = sizeof(client_addr_storage);
@@ -68,22 +68,19 @@ void WinSocket::acceptConnection(SOCKET &client_socket, void *client_address)
         throw SocketAcceptException("error accepting connections", WSAGetLastError());
     }
 
-    // Assuming client_address is meant to store the result
     if (client_address != nullptr)
     {
         std::memcpy(client_address, &client_addr_storage, client_addr_size);
     }
 
-    char ip_str[INET6_ADDRSTRLEN] = {0}; // Large enough for both IPv4 and IPv6
+    char ip_str[INET6_ADDRSTRLEN] = {0};
     if (client_addr_storage.ss_family == AF_INET)
     {
-        // IPv4
         struct sockaddr_in *addr_in = (struct sockaddr_in *)&client_addr_storage;
         inet_ntop(AF_INET, &addr_in->sin_addr, ip_str, INET_ADDRSTRLEN);
     }
     else if (client_addr_storage.ss_family == AF_INET6)
     {
-        // IPv6
         struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *)&client_addr_storage;
         inet_ntop(AF_INET6, &addr_in6->sin6_addr, ip_str, INET6_ADDRSTRLEN);
     }
@@ -94,9 +91,13 @@ void WinSocket::acceptConnection(SOCKET &client_socket, void *client_address)
     {
         if (this->client_ip == it)
         {
-            throw IPBlackListedException();
+            return false;
         }
     }
+
+    this->client_sockets.push_back(client_socket);
+
+    return true;
 }
 
 ssize_t WinSocket::receiveData(SOCKET client_socket, char *buffer, unsigned int buffer_size)

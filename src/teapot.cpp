@@ -195,7 +195,7 @@ Teapot::Teapot(std::string ip_address, unsigned int port, unsigned int max_conne
     this->cors_middleware = CORSMiddleware();
     this->security_middleware = SecurityMiddleware();
     this->logger = ConsoleLogger();
-    // Conditional compilation based on the operating system
+
 #ifdef __linux__
     this->socket = tpt::UnixSocket(this->logger, this->ip_address, this->port, this->max_connections);
 #endif
@@ -229,14 +229,14 @@ void Teapot::run()
 
         try
         {
-            socket.acceptConnection(client_socket, client_addr);
-            auto res = std::async(std::launch::async, &Teapot::requestHandler, this, client_socket);
-            // std::jthread th(&Teapot::requestHandler, this, client_socket);
-        }
-        catch (IPBlackListedException &e)
-        {
-            std::cout << e.what();
-            this->socket.closeSocket(client_socket);
+            if (socket.acceptConnection(client_socket, client_addr))
+            {
+                auto res = std::async(std::launch::async, &Teapot::requestHandler, this, client_socket);
+            }
+            else
+            {
+                this->socket.closeSocket(client_socket);
+            }
         }
         catch (SocketAcceptException &)
         {

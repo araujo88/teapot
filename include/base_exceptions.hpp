@@ -54,15 +54,6 @@ namespace tpt
             : BaseException(message, errorCode) {}
     };
 
-    class IPBlackListedException : public BaseException
-    {
-    public:
-        IPBlackListedException(
-            const std::string &message = "IP is blacklisted",
-            int errorCode = -1)
-            : BaseException(message, errorCode) {}
-    };
-
     class SocketCreationException : public BaseException
     {
     public:
