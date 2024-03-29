@@ -5,11 +5,11 @@ using namespace tpt;
 
 UnixSocket::UnixSocket() : UnixSocket(ConsoleLogger()) {}
 
-UnixSocket::UnixSocket(ConsoleLogger logger) : UnixSocket(logger, "127.0.0.1", 8000, 10) {}
+UnixSocket::UnixSocket(ConsoleLogger logger) : UnixSocket(logger, "127.0.0.1", 8000, 128) {}
 
-UnixSocket::UnixSocket(ConsoleLogger logger, unsigned int port) : UnixSocket(logger, "127.0.0.1", port, 10) {}
+UnixSocket::UnixSocket(ConsoleLogger logger, unsigned int port) : UnixSocket(logger, "127.0.0.1", port, 128) {}
 
-UnixSocket::UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned int port) : UnixSocket(logger, ip_address, port, 10) {}
+UnixSocket::UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned int port) : UnixSocket(logger, ip_address, port, 128) {}
 
 UnixSocket::UnixSocket(ConsoleLogger logger, std::string ip_address, unsigned int port, unsigned int max_connections)
 {

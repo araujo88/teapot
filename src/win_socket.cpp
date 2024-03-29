@@ -5,11 +5,11 @@ using namespace tpt;
 
 WinSocket::WinSocket() : WinSocket(ConsoleLogger()) {}
 
-WinSocket::WinSocket(ConsoleLogger logger) : WinSocket(logger, "127.0.0.1", 8000, 10) {}
+WinSocket::WinSocket(ConsoleLogger logger) : WinSocket(logger, "127.0.0.1", 8000, 128) {}
 
-WinSocket::WinSocket(ConsoleLogger logger, unsigned int port) : WinSocket(logger, "127.0.0.1", port, 10) {}
+WinSocket::WinSocket(ConsoleLogger logger, unsigned int port) : WinSocket(logger, "127.0.0.1", port, 128) {}
 
-WinSocket::WinSocket(ConsoleLogger logger, std::string ip_address, unsigned int port) : WinSocket(logger, ip_address, port, 10) {}
+WinSocket::WinSocket(ConsoleLogger logger, std::string ip_address, unsigned int port) : WinSocket(logger, ip_address, port, 128) {}
 
 WinSocket::WinSocket(ConsoleLogger logger, std::string ip_address, unsigned int port, unsigned int max_connections)
 {
@@ -61,7 +61,7 @@ void WinSocket::acceptConnection(SOCKET &client_socket, void *client_address)
     struct sockaddr_storage client_addr_storage;
     int client_addr_size = sizeof(client_addr_storage);
 
-    //this->setSocketTimeout(this->server_socket, 5);
+    // this->setSocketTimeout(this->server_socket, 5);
     client_socket = accept(this->server_socket, (sockaddr *)&client_addr_storage, &client_addr_size);
     if (client_socket == INVALID_SOCKET)
     {
